@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chief — A WhatsApp-native AI chief of staff</title>
+<meta name="description" content="Chief is an AI teammate that lives in your WhatsApp, runs a company of sub-agents on your behalf, and learns your business a little better every week." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          serif: ['Instrument Serif', 'serif'],
+          sans:  ['Inter', 'ui-sans-serif', 'system-ui'],
+          mono:  ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          bg:    '#F8F6F1',
+          ink:   '#0E1411',
+          muted: '#6B6B6B',
+          line:  '#E6E2D9',
+          wa:    '#25D366',
+          waDark:'#0B5C49',
+          paper: '#FFFDF8',
+        },
+        boxShadow: {
+          card: '0 1px 0 rgba(14,20,17,0.04), 0 12px 32px -16px rgba(14,20,17,0.18)',
+          soft: '0 1px 0 rgba(14,20,17,0.04), 0 4px 16px -8px rgba(14,20,17,0.10)',
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #F8F6F1; color: #0E1411; }
+  .grain {
+    background-image:
+      radial-gradient(1200px 600px at 12% -10%, rgba(37,211,102,0.07), transparent 60%),
+      radial-gradient(800px 480px at 110% 0%, rgba(14,20,17,0.05), transparent 60%);
+  }
+  .h-display { font-family: 'Instrument Serif', serif; letter-spacing: -0.01em; line-height: 1.02; }
+  .eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; }
+  .rule { border-top: 1px solid #E6E2D9; }
+  /* WhatsApp chat */
+  .chat-bg {
+    background-color: #ECE5DD;
+    background-image:
+      radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 22px 22px, 22px 22px;
+    background-position: 0 0, 11px 11px;
+  }
+  .bubble-in  { background: #FFFFFF; border-radius: 14px 14px 14px 4px; }
+  .bubble-out { background: #DCF8C6; border-radius: 14px 14px 4px 14px; }
+  .tick svg { display:inline-block; vertical-align:-2px; }
+  .nudge { transition: transform .25s ease, box-shadow .25s ease; }
+  .nudge:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(14,20,17,0.04), 0 18px 40px -20px rgba(14,20,17,0.25); }
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid #E6E2D9; border-radius:999px; font-size:12px; color:#0E1411; background:#FFFDF8; }
+  .dot  { width:6px; height:6px; border-radius:999px; background:#25D366; box-shadow: 0 0 0 4px rgba(37,211,102,0.18); }
+  .kbd  { font-family:'JetBrains Mono',monospace; font-size:12px; background:#0E1411; color:#F8F6F1; padding:2px 8px; border-radius:6px; }
+  .gridline {
+    background-image: linear-gradient(to right, rgba(14,20,17,0.05) 1px, transparent 1px);
+    background-size: 80px 100%;
+  }
+  .fadeIn { opacity: 0; transform: translateY(8px); animation: fadeIn .8s ease forwards; }
+  @keyframes fadeIn { to { opacity:1; transform:none; } }
+  .delay-100 { animation-delay: .1s; }
+  .delay-200 { animation-delay: .2s; }
+  .delay-300 { animation-delay: .3s; }
+  .delay-400 { animation-delay: .4s; }
+  .delay-500 { animation-delay: .5s; }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- NAV -->
+<header class="sticky top-0 z-30 backdrop-blur bg-bg/75 border-b border-line">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2">
+      <span class="h-7 w-7 rounded-full bg-ink text-bg grid place-items-center font-serif text-[15px] -mt-[1px]">C</span>
+      <span class="font-serif text-[20px]">Chief</span>
+      <span class="pill ml-2 hidden sm:inline-flex"><span class="dot"></span> v0.1 draft</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm text-muted">
+      <a href="#problem" class="hover:text-ink">The problem</a>
+      <a href="#how" class="hover:text-ink">How it works</a>
+      <a href="#who" class="hover:text-ink">Who it's for</a>
+      <a href="#faq" class="hover:text-ink">FAQ</a>
+    </nav>
+    <a href="#cta" class="inline-flex items-center gap-2 bg-ink text-bg text-sm rounded-full px-4 py-2 hover:bg-waDark transition-colors">
+      Add on WhatsApp
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="relative grain">
+  <div class="max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+    <div class="flex items-center gap-3 mb-8 fadeIn">
+      <span class="pill"><span class="dot"></span> WhatsApp-native</span>
+      <span class="text-xs text-muted">For non-technical operators</span>
+    </div>
+
+    <h1 class="h-display text-[44px] sm:text-[64px] md:text-[88px] max-w-4xl fadeIn delay-100">
+      Hire a chief of staff.<br/>
+      <span class="italic text-waDark">By text.</span>
+    </h1>
+
+    <p class="mt-8 max-w-2xl text-[18px] md:text-[20px] text-ink/80 leading-relaxed fadeIn delay-200">
+      Chief is an AI teammate that lives in your WhatsApp, runs a company of sub-agents on your behalf, and learns your business a little better every week. No new app. No new tab. No new login.
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-3 items-center fadeIn delay-300">
+      <a href="#cta" class="inline-flex items-center gap-2 bg-wa hover:bg-waDark text-white font-medium rounded-full px-5 py-3 transition-colors shadow-soft">
+        <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.945 2.722.945.817 0 2.15-.66 2.49-1.49.215-.515.32-1.117.32-1.59 0-.402-.3-.602-.605-.745-.6-.30-1.05-.43-1.19-.43zM16.115 4.79c-6.183 0-11.222 5.04-11.222 11.222 0 1.876.475 3.7 1.376 5.336L4.92 27.21l5.95-1.582a11.18 11.18 0 0 0 5.245 1.298c6.183 0 11.222-5.04 11.222-11.222 0-2.99-1.165-5.812-3.282-7.93-2.117-2.117-4.94-3.281-7.94-3.281zm0 20.474h-.02a9.225 9.225 0 0 1-4.704-1.293l-.34-.2-3.5.92.94-3.4-.215-.345a9.252 9.252 0 0 1-1.42-4.93c0-5.117 4.16-9.275 9.27-9.275 2.473 0 4.8.965 6.55 2.715a9.213 9.213 0 0 1 2.713 6.56c0 5.115-4.16 9.275-9.27 9.275z"/></svg>
+        Add Chief on WhatsApp
+      </a>
+      <a href="#how" class="inline-flex items-center gap-2 text-ink hover:text-waDark text-sm font-medium px-2 py-3">
+        Read the brief
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <span class="text-xs text-muted ml-2">Free for the first 100 operators</span>
+    </div>
+
+    <!-- HERO MOCKUP -->
+    <div class="mt-16 md:mt-20 grid md:grid-cols-12 gap-6 fadeIn delay-400">
+      <!-- WhatsApp chat -->
+      <div class="md:col-span-7">
+        <div class="bg-paper rounded-3xl border border-line shadow-card overflow-hidden">
+          <div class="flex items-center gap-3 px-5 py-3 bg-[#075E54] text-white">
+            <div class="h-9 w-9 rounded-full bg-white/15 grid place-items-center font-serif text-[16px]">C</div>
+            <div class="leading-tight">
+              <div class="text-[15px] font-medium">Chief</div>
+              <div class="text-[11px] text-white/70">online · typing…</div>
+            </div>
+            <div class="ml-auto flex items-center gap-4 text-white/80">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7 16 12l7 5V7zM3 5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92V21a1 1 0 0 1-1.11 1A19 19 0 0 1 2 4.11 1 1 0 0 1 3 3h4.09a1 1 0 0 1 1 .75l1 4a1 1 0 0 1-.27 1L7 10.21a16 16 0 0 0 6.79 6.79l1.46-1.82a1 1 0 0 1 1-.27l4 1a1 1 0 0 1 .75 1z"/></svg>
+            </div>
+          </div>
+
+          <div class="chat-bg p-5 space-y-3 text-[14px] min-h-[460px]">
+            <div class="flex">
+              <div class="bubble-in px-3 py-2 max-w-[78%] shadow">
+                Morning Tony. Two tasks queued from yesterday: finalize the Q2 investor update and chase the 4 overdue invoices. Want me to start with one or both?
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:42 AM</div>
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <div class="bubble-out px-3 py-2 max-w-[78%] shadow">
+                both. start with the update.
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:43 AM
+                  <span class="tick">
+                    <svg width="14" height="14" viewBox="0 0 16 11" fill="none"><path d="M11.071.653L4.871 6.853a.5.5 0 01-.708 0L1.293 3.983" stroke="#34B7F1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.485 1.929L8.285 8.129a.5.5 0 01-.708 0L6.293 6.844" stroke="#34B7F1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex">
+              <div class="bubble-in px-3 py-2 max-w-[78%] shadow">
+                On it. <span class="font-mono text-[12px] bg-black/5 px-1 py-0.5 rounded">/weekly-investor-update</span> running. Pulling KPIs from Stripe + HubSpot, drafting the narrative against last week's themes. Draft to you in ~6 min.
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:43 AM</div>
+              </div>
+            </div>
+
+            <div class="flex">
+              <div class="bubble-in px-3 py-2 max-w-[78%] shadow">
+                Heads up — invoice from Northbeam is now 21 days overdue. Want me to send the firm-but-friendly v3 template, or escalate to a call request?
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:44 AM</div>
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <div class="bubble-out px-3 py-2 max-w-[78%] shadow">
+                v3 template. cc me.
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:45 AM
+                  <span class="tick">
+                    <svg width="14" height="14" viewBox="0 0 16 11" fill="none"><path d="M11.071.653L4.871 6.853a.5.5 0 01-.708 0L1.293 3.983" stroke="#34B7F1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.485 1.929L8.285 8.129a.5.5 0 01-.708 0L6.293 6.844" stroke="#34B7F1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex">
+              <div class="bubble-in px-3 py-2 max-w-[78%] shadow">
+                Sent. Logged in HubSpot under <span class="font-mono text-[12px] bg-black/5 px-1 py-0.5 rounded">Northbeam › AR › attempt 3</span>. I'll save this as <span class="font-mono text-[12px] bg-black/5 px-1 py-0.5 rounded">/chase-overdue-invoices</span> if you want it in the playbook?
+                <div class="text-[10px] text-black/40 mt-1 text-right">7:45 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side: stats / what just happened -->
+      <div class="md:col-span-5 flex flex-col gap-4">
+        <div class="bg-paper rounded-3xl border border-line p-6 shadow-soft">
+          <div class="eyebrow text-muted">Behind that chat</div>
+          <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div class="rounded-xl border border-line p-3">
+              <div class="text-muted text-[11px] uppercase tracking-wider">Sub-agents engaged</div>
+              <div class="font-serif text-[28px] mt-1">4</div>
+              <div class="text-muted text-xs">Finance · Sales · Research · Knowledge</div>
+            </div>
+            <div class="rounded-xl border border-line p-3">
+              <div class="text-muted text-[11px] uppercase tracking-wider">Tools touched</div>
+              <div class="font-serif text-[28px] mt-1">7</div>
+              <div class="text-muted text-xs">Stripe · HubSpot · Gmail · Notion · Calendar · Slack · Drive</div>
+            </div>
+            <div class="rounded-xl border border-line p-3">
+              <div class="text-muted text-[11px] uppercase tracking-wider">Time saved</div>
+              <div class="font-serif text-[28px] mt-1">38<span class="text-base text-muted"> min</span></div>
+              <div class="text-muted text-xs">vs. doing it manually</div>
+            </div>
+            <div class="rounded-xl border border-line p-3">
+              <div class="text-muted text-[11px] uppercase tracking-wider">Skills proposed</div>
+              <div class="font-serif text-[28px] mt-1">2</div>
+              <div class="text-muted text-xs">Saved as slash commands</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-ink text-bg rounded-3xl p-6 shadow-card relative overflow-hidden">
+          <div class="eyebrow text-bg/60">This week, in your inbox</div>
+          <div class="font-serif text-[24px] mt-2 leading-snug">"Here's what your company learned how to do."</div>
+          <p class="text-bg/70 text-sm mt-3">A weekly digest of every new skill Chief built for you, every workflow it ran, and how many hours you got back.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-[12px]">
+            <span class="kbd">/weekly-investor-update</span>
+            <span class="kbd">/chase-overdue-invoices</span>
+            <span class="kbd">/draft-followup</span>
+            <span class="kbd">/calendar-tetris</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem" class="border-t border-line bg-paper/60">
+  <div class="max-w-6xl mx-auto px-6 py-24">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-4">
+        <div class="eyebrow text-muted">01 — The problem</div>
+        <h2 class="h-display text-[40px] md:text-[56px] mt-4">Why operators<br/>stall.</h2>
+        <p class="text-muted mt-4 max-w-sm">Non-technical operators watch their tech-savvy peers compound productivity through AI. They want in. They open ChatGPT, get one good answer, and then nothing persists.</p>
+      </div>
+      <div class="md:col-span-8 grid sm:grid-cols-3 gap-4">
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <div class="text-muted text-[11px] uppercase tracking-wider">Failure mode 01</div>
+          <h3 class="font-serif text-[26px] mt-2 leading-tight">The tools<br/>out-pace you.</h3>
+          <p class="text-sm text-ink/75 mt-3">Custom GPTs, Projects, MCP, Computer Use, Agents. By the time you've learned one, the next has shipped and the last one is buried.</p>
+        </div>
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <div class="text-muted text-[11px] uppercase tracking-wider">Failure mode 02</div>
+          <h3 class="font-serif text-[26px] mt-2 leading-tight">Your stack<br/>doesn't cooperate.</h3>
+          <p class="text-sm text-ink/75 mt-3">CRM, Gmail, calendar, Notion, Slack. None of them talk to each other on your behalf. AI lives in a separate browser tab you have to remember to open.</p>
+        </div>
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <div class="text-muted text-[11px] uppercase tracking-wider">Failure mode 03</div>
+          <h3 class="font-serif text-[26px] mt-2 leading-tight">Admin eats<br/>your billable hour.</h3>
+          <p class="text-sm text-ink/75 mt-3">For a $200/hr consultant, two hours of daily admin is <span class="font-medium text-ink">$100K</span> of foregone revenue per year. The opportunity cost compounds every quarter.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHT QUOTE -->
+<section class="border-t border-line">
+  <div class="max-w-5xl mx-auto px-6 py-24 md:py-32">
+    <div class="eyebrow text-muted">The mental model gap</div>
+    <p class="h-display text-[34px] md:text-[56px] mt-6 leading-[1.05]">
+      Tech operators think in <span class="italic">tools</span>.<br/>
+      Non-technical operators think in <span class="italic text-waDark">teammates</span>.<br/>
+      <span class="text-muted">Chief is built for the second mind.</span>
+    </p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="border-t border-line bg-paper/60">
+  <div class="max-w-6xl mx-auto px-6 py-24">
+    <div class="flex items-end justify-between gap-6 flex-wrap">
+      <div>
+        <div class="eyebrow text-muted">02 — How it works</div>
+        <h2 class="h-display text-[40px] md:text-[56px] mt-4">Three things make<br/>Chief different.</h2>
+      </div>
+      <p class="text-muted max-w-sm text-sm">A chatbot answers. A teammate executes, remembers, and gets sharper. Chief is a teammate.</p>
+    </div>
+
+    <!-- Pillar 1 -->
+    <div class="mt-16 grid md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-5">
+        <div class="text-waDark eyebrow">Pillar one</div>
+        <h3 class="h-display text-[36px] md:text-[44px] mt-3">It lives in WhatsApp.</h3>
+        <p class="text-ink/75 mt-4 max-w-md">No new app. No new tab. No new login. The interface is the messaging app you already check 80 times a day. Distribution beats novelty.</p>
+        <ul class="mt-6 space-y-2 text-sm text-ink/80">
+          <li class="flex items-start gap-2"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-wa shrink-0"></span> Text it like a teammate. Voice notes welcome.</li>
+          <li class="flex items-start gap-2"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-wa shrink-0"></span> Forward an email or PDF — Chief reads it.</li>
+          <li class="flex items-start gap-2"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-wa shrink-0"></span> Mute it on weekends. It still keeps working.</li>
+        </ul>
+      </div>
+      <div class="md:col-span-7">
+        <div class="bg-bg rounded-3xl border border-line p-6 shadow-soft">
+          <div class="chat-bg rounded-2xl p-4 space-y-3 text-[14px]">
+            <div class="flex justify-end"><div class="bubble-out px-3 py-2 max-w-[80%] shadow">forward to chief: "can you do tuesday 4pm"</div></div>
+            <div class="flex"><div class="bubble-in px-3 py-2 max-w-[80%] shadow">Got it. Found Tuesday 4pm conflict with Eric (founder sync). Two options: move Eric to Wed 10am, or offer the requester Wed 4pm. Pick one and I'll send.</div></div>
+            <div class="flex justify-end"><div class="bubble-out px-3 py-2 max-w-[80%] shadow">wed 10am for eric</div></div>
+            <div class="flex"><div class="bubble-in px-3 py-2 max-w-[80%] shadow">Done. Both invites updated. Eric notified with context. Saving this as <span class="font-mono text-[12px] bg-black/5 px-1 py-0.5 rounded">/calendar-tetris</span>?</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pillar 2 -->
+    <div class="mt-20 grid md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-7 order-2 md:order-1">
+        <div class="bg-bg rounded-3xl border border-line p-6 shadow-soft">
+          <div class="rounded-2xl border border-line p-6 bg-paper">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center gap-2 bg-ink text-bg px-4 py-1.5 rounded-full text-sm">
+                <span class="h-2 w-2 rounded-full bg-wa"></span> Chief
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 relative">
+              <!-- connecting lines -->
+              <svg class="absolute inset-x-0 -top-6 w-full h-6 text-line" preserveAspectRatio="none" viewBox="0 0 300 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M50 24 V12 H150 V0 M150 12 H250 V24 M50 24 V12" />
+              </svg>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Sales</div>
+                <div class="text-muted text-[11px] mt-1">CRM · Gmail · Calendar</div>
+              </div>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Operations</div>
+                <div class="text-muted text-[11px] mt-1">Notion · Slack · Drive</div>
+              </div>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Finance</div>
+                <div class="text-muted text-[11px] mt-1">Stripe · QBO · Sheets</div>
+              </div>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Research</div>
+                <div class="text-muted text-[11px] mt-1">Web · Files · Wiki</div>
+              </div>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Content</div>
+                <div class="text-muted text-[11px] mt-1">Docs · Email · Social</div>
+              </div>
+              <div class="rounded-xl border border-line p-3 text-center bg-bg">
+                <div class="font-serif text-[18px]">Knowledge</div>
+                <div class="text-muted text-[11px] mt-1">The wiki · Long-term memory</div>
+              </div>
+            </div>
+            <p class="text-center text-muted text-xs mt-6">Each team has its own tools, memory, and budget. Chief delegates and reports back.</p>
+          </div>
+        </div>
+      </div>
+      <div class="md:col-span-5 order-1 md:order-2">
+        <div class="text-waDark eyebrow">Pillar two</div>
+        <h3 class="h-display text-[36px] md:text-[44px] mt-3">It runs a company<br/>of sub-agents.</h3>
+        <p class="text-ink/75 mt-4 max-w-md">Behind the WhatsApp surface is an org chart: Sales, Operations, Finance, Research, Content, and Knowledge. Each team has its own tools and memory. Every artifact lands in your central wiki — your company's long-term brain.</p>
+      </div>
+    </div>
+
+    <!-- Pillar 3 -->
+    <div class="mt-20 grid md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-5">
+        <div class="text-waDark eyebrow">Pillar three</div>
+        <h3 class="h-display text-[36px] md:text-[44px] mt-3">It writes its<br/>own playbook.</h3>
+        <p class="text-ink/75 mt-4 max-w-md">Anything you do twice, Chief proposes saving as a slash command. Your library grows automatically — and is emailed to you weekly so you actually see what your organization is becoming.</p>
+      </div>
+      <div class="md:col-span-7">
+        <div class="bg-bg rounded-3xl border border-line p-6 shadow-soft">
+          <div class="rounded-2xl bg-ink p-5 font-mono text-[13px] text-bg/90 leading-relaxed">
+            <div class="text-bg/40">// your playbook · week 14</div>
+            <div class="mt-3 grid sm:grid-cols-2 gap-x-6 gap-y-1.5">
+              <div><span class="text-wa">/weekly-investor-update</span></div>
+              <div class="text-bg/50"># used 12×</div>
+              <div><span class="text-wa">/chase-overdue-invoices</span></div>
+              <div class="text-bg/50"># used 47×</div>
+              <div><span class="text-wa">/draft-followup</span></div>
+              <div class="text-bg/50"># used 81×</div>
+              <div><span class="text-wa">/calendar-tetris</span></div>
+              <div class="text-bg/50"># used 23×</div>
+              <div><span class="text-wa">/prep-for-monday</span></div>
+              <div class="text-bg/50"># used 14×</div>
+              <div><span class="text-wa">/research-prospect</span></div>
+              <div class="text-bg/50"># used 61×</div>
+              <div><span class="text-wa">/inbox-zero</span></div>
+              <div class="text-bg/50"># used 92×</div>
+              <div><span class="text-wa">/contract-redline</span></div>
+              <div class="text-bg/50"># used 6×</div>
+            </div>
+            <div class="mt-4 text-bg/50">→ proposed this week: <span class="text-wa">/onboard-new-client</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POSITIONING -->
+<section class="border-t border-line">
+  <div class="max-w-5xl mx-auto px-6 py-24 text-center">
+    <div class="eyebrow text-muted">Positioning</div>
+    <p class="h-display text-[30px] md:text-[44px] leading-[1.15] mt-6">
+      Why hire a chief of staff for <span class="line-through text-muted">$120K a year</span>,<br class="hidden md:block"/>
+      or wrestle with raw Claude or ChatGPT,<br class="hidden md:block"/>
+      when <span class="italic text-waDark">Chief</span> is a teammate that already knows<br class="hidden md:block"/>
+      your systems and gets sharper every week?
+    </p>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section id="who" class="border-t border-line bg-paper/60">
+  <div class="max-w-6xl mx-auto px-6 py-24">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-4">
+        <div class="eyebrow text-muted">03 — Who it's for</div>
+        <h2 class="h-display text-[40px] md:text-[56px] mt-4">Built for the people<br/>who run the work.</h2>
+        <p class="text-muted mt-4 max-w-sm">Solo operators and small teams in services businesses where principal time is the bottleneck on revenue.</p>
+      </div>
+      <div class="md:col-span-8 grid sm:grid-cols-2 gap-4">
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <h3 class="font-serif text-[24px]">Boutique agencies & consulting</h3>
+          <p class="text-sm text-ink/75 mt-2">Marketing, design, recruiting, M&A advisory. Small teams selling expertise.</p>
+        </div>
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <h3 class="font-serif text-[24px]">Independent professionals</h3>
+          <p class="text-sm text-ink/75 mt-2">Real estate brokers, attorneys, financial advisors, executive coaches. Their own ops.</p>
+        </div>
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <h3 class="font-serif text-[24px]">Early-stage founders</h3>
+          <p class="text-sm text-ink/75 mt-2">Running a company without a chief of staff or EA. Wearing all the hats.</p>
+        </div>
+        <div class="nudge bg-bg rounded-2xl border border-line p-6">
+          <h3 class="font-serif text-[24px]">Operators inside larger orgs</h3>
+          <p class="text-sm text-ink/75 mt-2">Non-technical leaders who want personal automation without IT approval cycles.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU GET BACK -->
+<section class="border-t border-line">
+  <div class="max-w-6xl mx-auto px-6 py-24">
+    <div class="eyebrow text-muted">04 — What changes for you</div>
+    <h2 class="h-display text-[40px] md:text-[56px] mt-4 max-w-3xl">In 30 days,<br/>your week looks different.</h2>
+
+    <div class="mt-12 grid md:grid-cols-3 gap-4">
+      <div class="rounded-3xl bg-ink text-bg p-8 shadow-card">
+        <div class="font-serif text-[80px] leading-none">5h+</div>
+        <div class="text-bg/70 text-sm uppercase tracking-wider mt-2">back per week</div>
+        <p class="text-bg/80 mt-4 text-sm">Time reclaimed from followups, calendar Tetris, CRM hygiene, and chasing invoices.</p>
+      </div>
+      <div class="rounded-3xl bg-bg border border-line p-8 shadow-card">
+        <div class="font-serif text-[80px] leading-none text-waDark">∞</div>
+        <div class="text-muted text-sm uppercase tracking-wider mt-2">a growing playbook</div>
+        <p class="text-ink/75 mt-4 text-sm">A slash-command library that compounds in value the longer you use Chief.</p>
+      </div>
+      <div class="rounded-3xl bg-bg border border-line p-8 shadow-card">
+        <div class="font-serif text-[80px] leading-none">1</div>
+        <div class="text-muted text-sm uppercase tracking-wider mt-2">company brain</div>
+        <p class="text-ink/75 mt-4 text-sm">A central wiki that becomes your business's long-term memory — across people and tools.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANTI-PERSONA / FAQ -->
+<section id="faq" class="border-t border-line bg-paper/60">
+  <div class="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-12 gap-10">
+    <div class="md:col-span-4">
+      <div class="eyebrow text-muted">05 — Honest disclaimers</div>
+      <h2 class="h-display text-[40px] md:text-[52px] mt-4">Not for everyone.</h2>
+      <p class="text-muted mt-4 max-w-sm">A short list of who Chief is <em>not</em> built for, on purpose.</p>
+    </div>
+    <div class="md:col-span-8 divide-y divide-line border-y border-line">
+      <details class="py-5 group" open>
+        <summary class="cursor-pointer flex justify-between items-center text-[18px] font-medium">
+          Engineering teams who want to build their own agents
+          <span class="text-muted group-open:rotate-45 transition-transform">+</span>
+        </summary>
+        <p class="text-ink/75 mt-3 text-sm">You're better served by Claude Code, the API, or n8n. Chief opinionates on workflow shape — that's the feature, not the bug.</p>
+      </details>
+      <details class="py-5 group">
+        <summary class="cursor-pointer flex justify-between items-center text-[18px] font-medium">
+          Enterprises that need SOC 2, SSO, and SAML on day one
+          <span class="text-muted group-open:rotate-45 transition-transform">+</span>
+        </summary>
+        <p class="text-ink/75 mt-3 text-sm">We're sequencing those. v1 ships for solo operators and small teams (1–25). Get on the enterprise waitlist and we'll come find you.</p>
+      </details>
+      <details class="py-5 group">
+        <summary class="cursor-pointer flex justify-between items-center text-[18px] font-medium">
+          Anyone hoping Chief replaces their CRM, ERP, or Notion
+          <span class="text-muted group-open:rotate-45 transition-transform">+</span>
+        </summary>
+        <p class="text-ink/75 mt-3 text-sm">It doesn't. Chief reads and writes to your systems of record. They stay. The drudgery of keeping them updated goes away.</p>
+      </details>
+      <details class="py-5 group">
+        <summary class="cursor-pointer flex justify-between items-center text-[18px] font-medium">
+          Voice-first or app-first users
+          <span class="text-muted group-open:rotate-45 transition-transform">+</span>
+        </summary>
+        <p class="text-ink/75 mt-3 text-sm">v1 is text-first via WhatsApp. Voice notes are accepted as input but the surface stays text. No custom mobile app — WhatsApp <em>is</em> the app.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="border-t border-line">
+  <div class="max-w-5xl mx-auto px-6 py-28 text-center">
+    <span class="pill"><span class="dot"></span> Free for the first 100 operators</span>
+    <h2 class="h-display text-[44px] md:text-[72px] mt-6 leading-[1.04]">Stop opening tabs.<br/>Start texting Chief.</h2>
+    <p class="text-muted mt-6 max-w-xl mx-auto">Add Chief to your WhatsApp. Connect your tools once. Watch the next week be different.</p>
+    <div class="mt-8 flex flex-wrap gap-3 justify-center items-center">
+      <a href="#" class="inline-flex items-center gap-2 bg-wa hover:bg-waDark text-white font-medium rounded-full px-5 py-3 transition-colors shadow-soft">
+        <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.945 2.722.945.817 0 2.15-.66 2.49-1.49.215-.515.32-1.117.32-1.59 0-.402-.3-.602-.605-.745-.6-.30-1.05-.43-1.19-.43zM16.115 4.79c-6.183 0-11.222 5.04-11.222 11.222 0 1.876.475 3.7 1.376 5.336L4.92 27.21l5.95-1.582a11.18 11.18 0 0 0 5.245 1.298c6.183 0 11.222-5.04 11.222-11.222 0-2.99-1.165-5.812-3.282-7.93-2.117-2.117-4.94-3.281-7.94-3.281zm0 20.474h-.02a9.225 9.225 0 0 1-4.704-1.293l-.34-.2-3.5.92.94-3.4-.215-.345a9.252 9.252 0 0 1-1.42-4.93c0-5.117 4.16-9.275 9.27-9.275 2.473 0 4.8.965 6.55 2.715a9.213 9.213 0 0 1 2.713 6.56c0 5.115-4.16 9.275-9.27 9.275z"/></svg>
+        Add Chief on WhatsApp
+      </a>
+      <a href="mailto:tony@chief.ai" class="inline-flex items-center gap-2 text-ink hover:text-waDark text-sm font-medium px-4 py-3 border border-line rounded-full bg-bg">
+        Talk to Tony
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-line bg-paper/60">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-wrap items-center justify-between gap-4 text-sm text-muted">
+    <div class="flex items-center gap-2">
+      <span class="h-6 w-6 rounded-full bg-ink text-bg grid place-items-center font-serif text-[13px]">C</span>
+      <span class="font-serif text-ink text-[18px]">Chief</span>
+      <span class="ml-3">© 2026 — A WhatsApp-native AI chief of staff</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <span>Tony Udotong</span>
+      <span>·</span>
+      <span>Draft v0.1</span>
+      <span>·</span>
+      <span>April 25, 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
