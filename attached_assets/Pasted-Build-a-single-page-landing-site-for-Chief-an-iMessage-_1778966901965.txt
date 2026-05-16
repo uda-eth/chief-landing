@@ -1,0 +1,184 @@
+Build a single-page landing site for "Chief" — an iMessage-native AI chief of staff for non-technical operators. This is going live at https://chief.remyndai.com and needs to capture leads via a Google Apps Script webhook.
+
+==========================================
+PRODUCT POSITIONING
+==========================================
+Product name: Chief
+One-liner: An iMessage-native AI chief of staff that runs the admin work of your business so you stop losing billable hours to ops.
+Primary ICP: Solo operators and small teams (1-25 people) in services businesses where principal time is the bottleneck on revenue — boutique agencies, consultants, real estate brokers, attorneys, financial advisors, early-stage founders without an EA.
+Core insight: Non-technical operators want a teammate, not a toolkit. ChatGPT serves people who think in tools. Chief serves people who think in delegation.
+Differentiators (use these as section anchors):
+  1. Lives in iMessage — no new app, no new tab, no new login
+  2. Runs a company of sub-agents — Sales, Ops, Finance, Research, Content, Knowledge — each with their own tools and memory
+  3. Builds its own playbook — every repeatable task becomes a saved /slash-command, library grows automatically, emailed weekly
+
+Positioning line: "Why hire a chief of staff for $120K/year when Chief is a teammate that already knows your systems and gets sharper every week?"
+
+==========================================
+TECH STACK
+==========================================
+- Vite + React + TypeScript
+- Tailwind CSS for styling
+- No backend server needed — form posts directly to Google Apps Script webhook
+- Deploy as a static site on Replit
+- Two routes: "/" (landing) and "/thank-you" (confirmation)
+- Use React Router
+
+==========================================
+DESIGN DIRECTION
+==========================================
+Aesthetic: clean, confident, slightly editorial. Think Linear meets Stripe meets a private members club. NOT a generic SaaS template.
+- Dark mode by default (#0A0A0A background, off-white text)
+- Single accent color: a warm metallic gold (#C9A961) — used sparingly for CTAs and key emphasis only
+- Typography: serif for headlines (Fraunces or Instrument Serif from Google Fonts), sans-serif for body (Inter)
+- Generous whitespace, large type, sharp edges (no rounded corners except buttons at 6px)
+- Subtle grain texture overlay on hero background
+- No stock illustrations, no emoji icons, no "AI sparkle" gradients
+- One subtle ambient animation in the hero: a fake iMessage thread with a "Chief is typing…" indicator (three pulsing dots in a gray bubble, iOS-style)
+
+==========================================
+LANDING PAGE STRUCTURE
+==========================================
+
+1. NAV (minimal)
+   - "Chief" wordmark left
+   - "Get Early Access" button right (scrolls to signup form)
+
+2. HERO
+   - Headline: "Your chief of staff lives in iMessage now."
+   - Subhead: "Chief is an AI teammate that runs the admin work of your business. Text it like you'd text any other operator. It learns your systems, builds your playbook, and gets sharper every week."
+   - Primary CTA button: "Get Early Access" (scrolls to form)
+   - Below CTA: small text "Limited beta. No credit card."
+   - Visual: a fake iMessage thread (iOS-style, blue outgoing bubbles on the right, gray incoming bubbles on the left) showing a short exchange where the user texts "remind clients with overdue invoices" and Chief replies "Drafted 7 follow-ups. Want me to send or review first?"
+
+3. PROBLEM SECTION ("Why this exists")
+   - Three short paragraphs (not bullets):
+     a) The tooling moves faster than non-technical operators can learn it.
+     b) AI lives in a separate browser tab they have to remember to open.
+     c) Every hour spent on followups, calendar Tetris, CRM hygiene, and invoice chasing is an hour not billed.
+   - Closer line: "ChatGPT serves people who think in tools. Chief serves people who think in delegation."
+
+4. HOW IT WORKS (three blocks, side by side on desktop, stacked on mobile)
+   - Block 1: "Lives in iMessage"
+     "No new app. No new login. Just a phone number you save as Chief. Text it the way you'd text any other team member."
+   - Block 2: "Runs a company of sub-agents"
+     "Behind the iMessage surface is an org chart: Sales, Operations, Finance, Research, Content, Knowledge. Chief delegates. The teams execute. Every artifact lands in your central knowledge base."
+   - Block 3: "Builds its own playbook"
+     "Every repeatable task becomes a saved skill — /weekly-investor-update, /draft-followup, /chase-overdue-invoices. Your library grows automatically and gets emailed to you each week."
+
+5. WHO IT'S FOR
+   - Heading: "Built for operators who bill by the hour."
+   - Short list (use prose-style list, not bullet markers):
+     - Boutique consulting firms and agencies
+     - Independent professionals running their own ops (real estate, law, finance)
+     - Early-stage founders without a chief of staff or EA
+     - Non-technical operators inside larger orgs who want personal automation
+
+6. SIGNUP FORM (this is the conversion point)
+   - Heading: "Join the private beta."
+   - Subhead: "Limited spots. We're letting in operators who can give us real feedback in the first 30 days."
+   - Form fields (all on one card, single column):
+     - Name (text, required)
+     - Email (email, required)
+     - What kind of work do you do? (text, required) — placeholder: "e.g. boutique M&A advisory, solo real estate broker, founder of a 6-person agency"
+     - What's the most annoying admin task you'd hand off first? (textarea, optional) — placeholder: "Be specific. This helps us prioritize."
+   - Submit button: "Request Access" (gold, full width)
+   - Below button, small text: "We'll get back to you within 48 hours."
+
+7. FOOTER
+   - Minimal. Just "Chief — A Remynd product" left, and a small "hello@chief.remyndai.com" right.
+
+==========================================
+SIGNUP FORM BEHAVIOR — CRITICAL
+==========================================
+On form submission:
+
+1. Read UTM parameters from the URL on page load and store in component state:
+   - utm_source, utm_medium, utm_campaign, utm_content
+   - Also capture document.referrer
+
+2. POST to this webhook URL (use fetch with no-cors mode since it's a Google Apps Script):
+   https://script.google.com/macros/s/AKfycbyxuWxWeaaXQPNzqBByPpDTheRpKAhd05Tro3Hgw56hLEKrnH6k-mu6VjXh-12VSM7N/exec
+
+3. Payload JSON must include these fields:
+{
+  "candidate_id": "chief",
+  "product_name": "Chief",
+  "product_slug": "chief",
+  "subdomain": "https://chief.remyndai.com",
+  "lead_name": "<form name>",
+  "lead_email": "<form email>",
+  "lead_company_role": "<form: what kind of work>",
+  "intent_signal": "<form: most annoying admin task>",
+  "notes_from_lead": "<form: most annoying admin task>",
+  "custom_question": "What's the most annoying admin task you'd hand off first?",
+  "custom_answer": "<form: most annoying admin task>",
+  "source": "<utm_source or 'direct'>",
+  "channel": "<utm_medium or 'organic'>",
+  "campaign": "<utm_campaign or ''>",
+  "utm_source": "<from URL>",
+  "utm_medium": "<from URL>",
+  "utm_campaign": "<from URL>",
+  "utm_content": "<from URL>",
+  "referrer": "<document.referrer>",
+  "landing_page_url": "<window.location.href>",
+  "confirmation_page_url": "https://chief.remyndai.com/thank-you",
+  "consent_captured": "Yes"
+}
+
+4. Use mode: 'no-cors' on the fetch — Google Apps Script will accept the POST but the browser won't see the response. That's fine. Treat the request as successful if the fetch promise resolves.
+
+5. On success (or fetch resolution), navigate to /thank-you.
+
+6. Show loading state on the button while submitting ("Sending…").
+
+7. Basic client-side validation: require name, email (with regex check), and work description. Disable submit until valid.
+
+==========================================
+THANK-YOU PAGE (/thank-you)
+==========================================
+- Same nav and footer
+- Centered card
+- Headline: "You're on the list."
+- Body: "We'll reach out within 48 hours from hello@chief.remyndai.com. While you wait, save +1 (XXX) XXX-XXXX in your contacts as Chief and text it to try a 5-minute iMessage demo."
+  (use placeholder phone for now — Tony will swap)
+- A small "Back to home" link
+
+==========================================
+GA4 TRACKING — CRITICAL
+==========================================
+Install Google Analytics 4 on BOTH the landing page and the thank-you page.
+
+Add this to the <head> of index.html:
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WXVVB2ETRN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WXVVB2ETRN');
+</script>
+
+Since this is an SPA, also fire a page_view event on route change:
+- In a useEffect hook that listens to route changes, call:
+  window.gtag('event', 'page_view', { page_path: location.pathname });
+
+==========================================
+DEPLOYMENT NOTES
+==========================================
+- Build for static hosting
+- Provide me the public Replit deployment URL once live so I can pass it to Eric for the CNAME setup
+- Make sure /thank-you is reachable via direct URL (configure SPA fallback so refreshing on /thank-you doesn't 404)
+
+==========================================
+DO NOT DO
+==========================================
+- Do not add cookie banners, popups, exit-intent modals, or any anti-pattern conversion tactics
+- Do not use Lottie animations or heavy 3D
+- Do not add testimonials, fake logos, or "trusted by" sections — we don't have those yet
+- Do not auto-play any audio or video
+- Do not use the words "revolutionize," "leverage," "synergy," or "game-changer" anywhere
+- Do not use em dashes in copy — use periods or commas instead
+
+Build it. Show me the live URL when done.
