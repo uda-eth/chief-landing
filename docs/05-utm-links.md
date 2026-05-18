@@ -141,6 +141,12 @@ https://chief.remyndai.com/?utm_source=in-person&utm_medium=event&utm_campaign=p
 ```
 
 ```
+https://chief.remyndai.com/?utm_source=in-person&utm_medium=event&utm_campaign=phase2-sprint&utm_content=in-person-ai-hack
+```
+
+(QR code for the AI hacking event lives at `/qr/chief-signup.png` and `/qr/chief-signup.svg`. Encodes the `in-person-ai-hack` URL.)
+
+```
 https://chief.remyndai.com/?utm_source=qr&utm_medium=print&utm_campaign=phase2-sprint&utm_content=qr-code-conference
 ```
 
