@@ -1,0 +1,28 @@
+channel,source,medium,campaign,content,final_url
+Snapchat Creative A Identity,snapchat,paid,phase2-sprint,snap-creative-a-identity,https://chief.remyndai.com/?utm_source=snapchat&utm_medium=paid&utm_campaign=phase2-sprint&utm_content=snap-creative-a-identity
+Snapchat Creative B Pain,snapchat,paid,phase2-sprint,snap-creative-b-pain,https://chief.remyndai.com/?utm_source=snapchat&utm_medium=paid&utm_campaign=phase2-sprint&utm_content=snap-creative-b-pain
+Snapchat Winner,snapchat,paid,phase2-sprint,snap-winner,https://chief.remyndai.com/?utm_source=snapchat&utm_medium=paid&utm_campaign=phase2-sprint&utm_content=snap-winner
+Reddit r/Entrepreneur post,reddit,organic,phase2-sprint,reddit-entrepreneur-post-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-entrepreneur-post-01
+Reddit r/SaaS post,reddit,organic,phase2-sprint,reddit-saas-post-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-saas-post-01
+Reddit r/SideProject post,reddit,organic,phase2-sprint,reddit-sideproject-post-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-sideproject-post-01
+Reddit r/smallbusiness post,reddit,organic,phase2-sprint,reddit-smallbusiness-post-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-smallbusiness-post-01
+Reddit r/AlphaAndBetaUsers post,reddit,organic,phase2-sprint,reddit-alphabeta-post-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-alphabeta-post-01
+Reddit r/indiehackers retrospective,reddit,organic,phase2-sprint,reddit-indiehackers-retrospective-01,https://chief.remyndai.com/?utm_source=reddit&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=reddit-indiehackers-retrospective-01
+LinkedIn DM Pain,linkedin,dm,phase2-sprint,linkedin-dm-pain,https://chief.remyndai.com/?utm_source=linkedin&utm_medium=dm&utm_campaign=phase2-sprint&utm_content=linkedin-dm-pain
+LinkedIn DM Curiosity,linkedin,dm,phase2-sprint,linkedin-dm-curiosity,https://chief.remyndai.com/?utm_source=linkedin&utm_medium=dm&utm_campaign=phase2-sprint&utm_content=linkedin-dm-curiosity
+LinkedIn DM Proof,linkedin,dm,phase2-sprint,linkedin-dm-proof,https://chief.remyndai.com/?utm_source=linkedin&utm_medium=dm&utm_campaign=phase2-sprint&utm_content=linkedin-dm-proof
+LinkedIn Organic Post,linkedin,organic,phase2-sprint,linkedin-post-01,https://chief.remyndai.com/?utm_source=linkedin&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=linkedin-post-01
+X Post 01,x,organic,phase2-sprint,x-post-01,https://chief.remyndai.com/?utm_source=x&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=x-post-01
+X Post 02,x,organic,phase2-sprint,x-post-02,https://chief.remyndai.com/?utm_source=x&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=x-post-02
+X Post 03,x,organic,phase2-sprint,x-post-03,https://chief.remyndai.com/?utm_source=x&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=x-post-03
+X Post 04 Retrospective,x,organic,phase2-sprint,x-post-04-retrospective,https://chief.remyndai.com/?utm_source=x&utm_medium=organic&utm_campaign=phase2-sprint&utm_content=x-post-04-retrospective
+Discord Indie Hackers,discord,community,phase2-sprint,discord-indiehackers,https://chief.remyndai.com/?utm_source=discord&utm_medium=community&utm_campaign=phase2-sprint&utm_content=discord-indiehackers
+Discord Founder Cafe,discord,community,phase2-sprint,discord-founder-cafe,https://chief.remyndai.com/?utm_source=discord&utm_medium=community&utm_campaign=phase2-sprint&utm_content=discord-founder-cafe
+Discord Hustle Cafe,discord,community,phase2-sprint,discord-hustlecafe,https://chief.remyndai.com/?utm_source=discord&utm_medium=community&utm_campaign=phase2-sprint&utm_content=discord-hustlecafe
+Discord Lunadio,discord,community,phase2-sprint,discord-lunadio,https://chief.remyndai.com/?utm_source=discord&utm_medium=community&utm_campaign=phase2-sprint&utm_content=discord-lunadio
+Slack Launch Club,slack,community,phase2-sprint,slack-launchclub,https://chief.remyndai.com/?utm_source=slack&utm_medium=community&utm_campaign=phase2-sprint&utm_content=slack-launchclub
+Slack Online Geniuses,slack,community,phase2-sprint,slack-onlinegeniuses,https://chief.remyndai.com/?utm_source=slack&utm_medium=community&utm_campaign=phase2-sprint&utm_content=slack-onlinegeniuses
+Email Warm Intro,email,warm-intro,phase2-sprint,email-warm-intro,https://chief.remyndai.com/?utm_source=email&utm_medium=warm-intro&utm_campaign=phase2-sprint&utm_content=email-warm-intro
+SMS Warm Circle,sms,direct,phase2-sprint,sms-warm-circle,https://chief.remyndai.com/?utm_source=sms&utm_medium=direct&utm_campaign=phase2-sprint&utm_content=sms-warm-circle
+In Person UATX,in-person,event,phase2-sprint,in-person-uatx,https://chief.remyndai.com/?utm_source=in-person&utm_medium=event&utm_campaign=phase2-sprint&utm_content=in-person-uatx
+QR Code Conference,qr,print,phase2-sprint,qr-code-conference,https://chief.remyndai.com/?utm_source=qr&utm_medium=print&utm_campaign=phase2-sprint&utm_content=qr-code-conference
