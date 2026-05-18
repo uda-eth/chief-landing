@@ -1,4 +1,4 @@
-modules = ["web", "python-3.11", "nodejs-20"]
+modules = ["web", "python-3.11"]
 [agent]
 expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
@@ -22,15 +22,14 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 -m http.server 5000 --bind 0.0.0.0"
+waitForPort = 5000
+
 [workflows.workflow.metadata]
 outputType = "webview"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
-
 [deployment]
 deploymentTarget = "static"
-publicDir = "dist"
-build = ["npm", "run", "build"]
+publicDir = "."

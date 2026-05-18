@@ -1,28 +1,968 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Chief is an AI teammate that runs the admin work of your business. Text it like you'd text any other operator. It learns your systems, builds your playbook, and gets sharper every week." />
-    <title>Chief — Your AI Chief of Staff in iMessage</title>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chief — Your chief of staff. In iMessage.</title>
+<meta name="description" content="Chief is an AI chief of staff for founders. Text it over iMessage. Every interaction is written to a private Obsidian vault in your iCloud. You own the brain." />
+<meta name="theme-color" content="#F7F6F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['-apple-system','BlinkMacSystemFont','SF Pro Text','SF Pro Display','Inter','ui-sans-serif','system-ui','sans-serif'],
+          display: ['-apple-system','BlinkMacSystemFont','SF Pro Display','Inter','ui-sans-serif','system-ui','sans-serif'],
+          mono: ['JetBrains Mono','ui-monospace','SF Mono','monospace'],
+        },
+        colors: {
+          bg:      '#F7F6F3',
+          paper:   '#FFFFFF',
+          ink:     '#0A2540',
+          text:    '#1A1A1A',
+          muted:   '#6B7280',
+          line:    '#E5E3DD',
+          imsg:    '#0B84FE',
+          imsgInk: '#FFFFFF',
+          imsgGrey:'#E9E9EB',
+          obsBg:   '#1E1E22',
+          obsSide: '#16161A',
+          obsAccent:'#7C5CFF',
+        },
+        boxShadow: {
+          card: '0 1px 0 rgba(10,37,64,0.04), 0 18px 40px -24px rgba(10,37,64,0.18)',
+          soft: '0 1px 0 rgba(10,37,64,0.04), 0 6px 18px -10px rgba(10,37,64,0.12)',
+          phone: '0 30px 80px -30px rgba(10,37,64,0.35), 0 8px 24px -12px rgba(10,37,64,0.18)',
+          mac:  '0 40px 100px -40px rgba(10,37,64,0.35), 0 12px 30px -12px rgba(10,37,64,0.20)',
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background: #F7F6F3;
+    color: #1A1A1A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Subtle paper grain — no gradients */
+  .grain {
+    background-image:
+      radial-gradient(rgba(10,37,64,0.025) 1px, transparent 1px),
+      radial-gradient(rgba(10,37,64,0.02) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 1px;
+  }
+  .display { letter-spacing: -0.025em; line-height: 1.04; }
+  .display-sm { letter-spacing: -0.02em; line-height: 1.08; }
+  .eyebrow { letter-spacing: 0.16em; text-transform: uppercase; font-size: 11px; font-weight: 500; }
+  .rule { border-top: 1px solid #E5E3DD; }
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #0A2540; color: #FFFFFF;
+    padding: 14px 22px; border-radius: 999px;
+    font-weight: 500; font-size: 15px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    box-shadow: 0 1px 0 rgba(10,37,64,0.06), 0 8px 20px -10px rgba(10,37,64,0.35);
+  }
+  .btn-primary:hover { background: #06192C; transform: translateY(-1px); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #0A2540; padding: 12px 18px; border-radius: 999px;
+    border: 1px solid #E5E3DD; background: #FFFFFF; font-weight: 500; font-size: 14px;
+  }
+  .pill {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 12px; border:1px solid #E5E3DD; border-radius:999px;
+    font-size:12px; color:#0A2540; background:#FFFFFF;
+  }
+  .dot { width:6px; height:6px; border-radius:999px; background:#0A2540; }
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WXVVB2ETRN"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-WXVVB2ETRN');
-    </script>
+  /* iPhone frame */
+  .iphone {
+    width: 320px;
+    border-radius: 44px;
+    background: #0A0A0A;
+    padding: 10px;
+    position: relative;
+  }
+  .iphone-screen {
+    border-radius: 36px;
+    background: #FFFFFF;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 9 / 19.5;
+    display: flex; flex-direction: column;
+  }
+  .notch {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 26px; background: #0A0A0A;
+    border-radius: 999px; z-index: 5;
+  }
+  .imsg-status {
+    padding: 14px 16px 8px; display:flex; align-items:center; justify-content:space-between;
+    font-size: 13px; font-weight: 600; color:#1A1A1A;
+  }
+  .imsg-header {
+    display:flex; flex-direction:column; align-items:center;
+    padding: 6px 0 10px;
+    border-bottom: 0.5px solid #E5E5EA;
+  }
+  .imsg-avatar {
+    width: 38px; height: 38px; border-radius: 999px;
+    background: #0A2540; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight: 600; font-size: 14px; letter-spacing: 0.02em;
+  }
+  .imsg-name { font-size: 12px; color:#1A1A1A; margin-top: 4px; font-weight: 500; }
+  .imsg-thread {
+    flex: 1; padding: 14px 12px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+    background: #FFFFFF;
+  }
+  .imsg-bubble {
+    max-width: 78%; padding: 8px 12px; font-size: 13px; line-height: 1.35;
+    border-radius: 18px; word-wrap: break-word;
+  }
+  .imsg-bubble.out {
+    align-self: flex-end;
+    background: #0B84FE; color: #FFFFFF;
+    border-bottom-right-radius: 6px;
+  }
+  .imsg-bubble.in {
+    align-self: flex-start;
+    background: #E9E9EB; color: #1A1A1A;
+    border-bottom-left-radius: 6px;
+  }
+  .imsg-meta {
+    text-align:center; font-size: 10px; color:#8E8E93;
+    padding: 4px 0 8px; font-weight: 500;
+  }
+  .imsg-input {
+    border-top: 0.5px solid #E5E5EA;
+    padding: 8px 12px; display:flex; align-items:center; gap: 8px;
+    background:#F7F6F3;
+  }
+  .imsg-input-box {
+    flex:1; height: 30px; border-radius: 999px; border: 0.5px solid #D1D1D6;
+    background:#FFFFFF; display:flex; align-items:center; padding: 0 12px;
+    font-size: 12px; color:#8E8E93;
+  }
+  .home-indicator {
+    width: 110px; height: 4px; background:#1A1A1A; border-radius: 999px;
+    margin: 6px auto 8px;
+  }
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  /* Mac window (Obsidian) */
+  .mac {
+    border-radius: 14px;
+    background: #1E1E22;
+    overflow: hidden;
+    border: 1px solid #2A2A30;
+  }
+  .mac-titlebar {
+    height: 36px; background: #2A2A30; display:flex; align-items:center; padding: 0 12px; gap: 8px;
+    border-bottom: 1px solid #16161A;
+  }
+  .traffic { width: 12px; height: 12px; border-radius: 999px; }
+  .traffic.r { background: #FF5F57; }
+  .traffic.y { background: #FEBC2E; }
+  .traffic.g { background: #28C840; }
+  .mac-title { color:#9A9AA2; font-size: 12px; flex:1; text-align:center; font-weight: 500; }
+  .obs {
+    display:grid; grid-template-columns: 200px 1fr; min-height: 360px;
+  }
+  .obs-side {
+    background: #16161A; color: #C7C7CF; padding: 14px 10px;
+    font-size: 12px; border-right: 1px solid #0F0F12;
+  }
+  .obs-side .vault {
+    color:#FFFFFF; font-weight: 600; font-size: 12px; padding: 4px 6px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .obs-folder { padding: 4px 6px; display:flex; align-items:center; gap:6px; color:#C7C7CF; }
+  .obs-folder.open { color:#FFFFFF; }
+  .obs-file { padding: 3px 6px 3px 22px; color:#9A9AA2; font-size: 11.5px; }
+  .obs-file.active { background: rgba(124,92,255,0.15); color:#FFFFFF; border-radius: 4px; }
+  .obs-main { padding: 18px 22px; color:#E5E3DD; }
+  .obs-h1 { color:#FFFFFF; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .obs-meta { color:#7C7C84; font-size: 11px; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; }
+  .obs-h2 { color:#FFFFFF; font-weight: 600; font-size: 14px; margin: 14px 0 6px; }
+  .obs-p { color:#C7C7CF; font-size: 12.5px; line-height: 1.6; }
+  .obs-li { color:#C7C7CF; font-size: 12.5px; line-height: 1.7; padding-left: 14px; position: relative; }
+  .obs-li::before { content: "-"; position:absolute; left: 0; color:#7C5CFF; }
+  .obs-link { color:#7C5CFF; }
+  .obs-tag { color:#7C5CFF; background: rgba(124,92,255,0.10); padding: 0 6px; border-radius: 4px; font-size: 11.5px; font-family:'JetBrains Mono', monospace; }
+
+  /* Flow arrow between iMessage and Obsidian */
+  .flow {
+    position: relative; width: 56px;
+  }
+  .flow svg { width: 100%; height: 100%; }
+
+  .fadeIn { opacity: 0; transform: translateY(8px); animation: fadeIn .7s ease forwards; }
+  @keyframes fadeIn { to { opacity:1; transform:none; } }
+  .d100 { animation-delay: .08s; } .d200 { animation-delay: .16s; }
+  .d300 { animation-delay: .24s; } .d400 { animation-delay: .32s; }
+  .d500 { animation-delay: .40s; } .d600 { animation-delay: .48s; }
+
+  /* Section spacing */
+  .section { padding: 96px 0; }
+  @media (max-width: 768px) {
+    .section { padding: 64px 0; }
+    .iphone { width: 280px; }
+  }
+</style>
+</head>
+<body class="font-sans">
+
+<!-- NAV -->
+<header class="border-b border-line/70 bg-bg/80 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2">
+      <span class="w-7 h-7 rounded-lg bg-ink text-white flex items-center justify-center text-[13px] font-semibold">C</span>
+      <span class="text-ink font-semibold tracking-tight">Chief</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm text-text/80">
+      <a href="#how" class="hover:text-ink">How it works</a>
+      <a href="#team" class="hover:text-ink">The team</a>
+      <a href="#vault" class="hover:text-ink">The vault</a>
+      <a href="#faq" class="hover:text-ink">FAQ</a>
+    </nav>
+    <a href="#invite" class="btn-primary !py-2.5 !px-4 text-[13px]">Request an invite</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="grain">
+  <div class="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+    <div class="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div class="fadeIn">
+        <div class="pill mb-6"><span class="dot"></span><span>Now onboarding founders</span></div>
+        <h1 class="display text-ink text-[44px] sm:text-[56px] md:text-[68px] font-semibold">
+          Your chief of staff.<br/>In iMessage.
+        </h1>
+        <p class="text-text/75 text-[17px] md:text-[19px] leading-relaxed mt-6 max-w-[520px]">
+          Chief runs your day over iMessage. Schedules, follow-ups, research, inbox triage, vendor chasing. Everything it learns gets written to a private Obsidian vault in your iCloud, so the brain you build is yours forever.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
+          <a href="#invite" class="btn-primary">Request an invite</a>
+          <span class="text-sm text-muted">Limited spots. We onboard founders one at a time.</span>
+        </div>
+        <div class="mt-10 flex items-center gap-6 text-xs text-muted">
+          <div class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            iMessage
+          </div>
+          <div class="opacity-50">·</div>
+          <div>WhatsApp</div>
+          <div class="opacity-50">·</div>
+          <div>Telegram</div>
+        </div>
+      </div>
+
+      <!-- iMessage mockup -->
+      <div class="fadeIn d200 flex justify-center md:justify-end">
+        <div class="iphone shadow-phone">
+          <div class="iphone-screen">
+            <div class="notch"></div>
+            <div class="imsg-status">
+              <span>9:41</span>
+              <span class="flex items-center gap-1">
+                <svg width="14" height="10" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="3" width="2" height="6" rx="1"/><rect x="4" y="2" width="2" height="8" rx="1"/><rect x="8" y="1" width="2" height="10" rx="1"/><rect x="12" y="0" width="2" height="12" rx="1"/></svg>
+                <svg width="22" height="10" viewBox="0 0 24 10" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="1" width="18" height="8" rx="2"/><rect x="3" y="3" width="14" height="4" rx="1" fill="currentColor"/><rect x="20" y="3.5" width="2" height="3" rx="0.5" fill="currentColor"/></svg>
+              </span>
+            </div>
+            <div class="imsg-header">
+              <div class="imsg-avatar">C</div>
+              <div class="imsg-name">Chief</div>
+            </div>
+            <div class="imsg-thread">
+              <div class="imsg-meta">Today 8:42 AM</div>
+              <div class="imsg-bubble out">remind me to follow up with the lawyer about the SAFE on Friday</div>
+              <div class="imsg-bubble in">Done. I'll ping you Friday 9am.</div>
+              <div class="imsg-bubble in">Want me to draft the follow-up now based on your last thread with him?</div>
+              <div class="imsg-bubble out">yes</div>
+              <div class="imsg-bubble in">Drafted. Saved to your vault under <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(0,0,0,0.05);padding:1px 5px;border-radius:4px;">/legal/safe-followups</span>. Ready to send when you are.</div>
+              <div class="imsg-meta" style="text-align:right; padding-right:6px;">Delivered</div>
+            </div>
+            <div class="imsg-input">
+              <div class="imsg-input-box">iMessage</div>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#0B84FE"><circle cx="12" cy="12" r="11"/><path d="M12 7v10M7 12h10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="home-indicator"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2 — THE PROBLEM -->
+<section class="section">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <div class="eyebrow text-muted">The problem</div>
+    <h2 class="display text-ink text-[40px] md:text-[56px] font-semibold mt-4">You are the bottleneck.</h2>
+    <div class="mt-10 space-y-4 text-text/80 text-[18px] md:text-[20px] leading-relaxed">
+      <p>Every follow-up sits in your head.</p>
+      <p>Every decision routes through you.</p>
+      <p>Every loose end becomes tomorrow's fire.</p>
+    </div>
+    <p class="mt-10 text-ink text-[18px] md:text-[20px] font-medium">A chief of staff fixes this. You can't afford one yet.</p>
+  </div>
+</section>
+
+<div class="rule max-w-6xl mx-auto"></div>
+
+<!-- SECTION 3 — HOW IT WORKS -->
+<section id="how" class="section">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-2xl">
+      <div class="eyebrow text-muted">How Chief works</div>
+      <h2 class="display text-ink text-[36px] md:text-[52px] font-semibold mt-4">Three things. That's the whole product.</h2>
+    </div>
+
+    <div class="mt-20 md:mt-24 space-y-24 md:space-y-32">
+
+      <!-- ACT 01 — TEXT -->
+      <article class="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+        <div class="md:col-span-5 order-2 md:order-1">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-mono text-[13px] text-muted">01</span>
+            <span class="h-px w-10 bg-line"></span>
+            <span class="eyebrow text-ink">Text</span>
+          </div>
+          <h3 class="display-sm text-ink text-[30px] md:text-[40px] font-semibold leading-[1.1]">
+            Send Chief anything.
+          </h3>
+          <p class="text-text/75 text-[16px] md:text-[17px] leading-relaxed mt-5 max-w-md">
+            Tasks. Reminders. Half-formed thoughts. Voice notes. Screenshots. No app to open. No new tool to learn. If you can text it, Chief can act on it.
+          </p>
+          <div class="mt-7 flex flex-wrap gap-2">
+            <span class="pill" style="font-size:11px;">Text</span>
+            <span class="pill" style="font-size:11px;">Voice notes</span>
+            <span class="pill" style="font-size:11px;">Screenshots</span>
+            <span class="pill" style="font-size:11px;">Forwarded emails</span>
+          </div>
+        </div>
+        <div class="md:col-span-7 order-1 md:order-2 flex justify-center md:justify-end">
+          <!-- Inbound artifact: mixed-media iMessage stack -->
+          <div class="w-full max-w-[400px] bg-paper border border-line rounded-3xl p-5 shadow-card">
+            <div class="flex items-center justify-between text-[11px] text-muted mb-4 px-1">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-ink text-white flex items-center justify-center text-[9px] font-semibold">C</span>
+                <span class="font-medium text-text">To Chief</span>
+              </div>
+              <span class="font-mono">9:41</span>
+            </div>
+            <div class="flex flex-col gap-2 items-end">
+              <div class="imsg-bubble out" style="font-size:13px;">remind me to call jane tomorrow at 3</div>
+              <!-- Voice note bubble -->
+              <div class="imsg-bubble out" style="font-size:13px; display:flex; align-items:center; gap:10px; padding:10px 14px;">
+                <span style="width:22px; height:22px; border-radius:999px; background:#FFFFFF; display:flex; align-items:center; justify-content:center;">
+                  <svg width="9" height="11" viewBox="0 0 9 11" fill="#0B84FE"><path d="M0 0v11l9-5.5L0 0z"/></svg>
+                </span>
+                <span class="flex items-end gap-[2px] h-4">
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:30%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:55%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:80%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:65%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:95%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:50%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:75%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:40%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:65%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:35%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:60%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:80%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:45%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:70%"></span>
+                  <span class="block w-[2px] rounded-full bg-white/85" style="height:30%"></span>
+                </span>
+                <span class="font-mono text-[11px] text-white/80">0:14</span>
+              </div>
+              <!-- Screenshot bubble -->
+              <div style="background:#0B84FE; border-radius:18px 18px 6px 18px; padding:6px; max-width:78%;">
+                <div style="background:#FFFFFF; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:5px;">
+                  <div style="height:6px; background:#E5E3DD; border-radius:3px; width:70%;"></div>
+                  <div style="height:6px; background:#E5E3DD; border-radius:3px; width:45%;"></div>
+                  <div style="height:48px; background:#F7F6F3; border-radius:6px; margin-top:4px; display:flex; align-items:center; justify-content:center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8B5AC" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+                  </div>
+                  <div style="height:6px; background:#E5E3DD; border-radius:3px; width:60%;"></div>
+                </div>
+                <div style="color:rgba(255,255,255,0.9); font-size:11px; margin-top:6px; padding:0 4px; display:flex; align-items:center; gap:6px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                  pricing-page.png
+                </div>
+              </div>
+              <div class="imsg-bubble out" style="font-size:13px;">pull the action items from this</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ACT 02 — EXECUTE -->
+      <article class="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+        <div class="md:col-span-7 order-1 flex justify-center md:justify-start">
+          <!-- Action artifact: fanned stack of tool cards -->
+          <div class="relative w-full max-w-[460px]" style="height: 320px;">
+            <!-- Gmail draft -->
+            <div class="absolute bg-paper border border-line rounded-2xl p-4 shadow-card"
+                 style="top:0; left:0; right:18%; transform: rotate(-4deg); z-index:1;">
+              <div class="flex items-center gap-2 text-[11px] text-muted mb-2.5">
+                <span class="w-4 h-4 rounded-[3px] bg-[#EA4335] flex items-center justify-center text-white" style="font-size:9px; font-weight:700; line-height:1;">M</span>
+                <span class="font-medium text-text">Gmail · Drafts</span>
+                <span class="font-mono ml-auto">9:42</span>
+              </div>
+              <div class="text-ink text-[13.5px] font-semibold leading-snug">Re: Acme — pilot scope for Q3</div>
+              <p class="text-muted text-[11.5px] mt-1.5 leading-snug">Hi Jane, following up on yesterday's call. Attaching scope &amp; timeline we discussed — let me know if anything's off…</p>
+              <div class="flex items-center gap-2 mt-3 pt-2.5 border-t border-line">
+                <span class="w-5 h-5 rounded-full bg-ink text-white flex items-center justify-center" style="font-size:9px; font-weight:600;">JP</span>
+                <span class="text-[11px] text-muted">jane.park@acme.com</span>
+              </div>
+            </div>
+
+            <!-- Calendar event -->
+            <div class="absolute bg-paper border border-line rounded-2xl p-4 shadow-card"
+                 style="top:42%; left:14%; right:0; transform: rotate(3deg); z-index:2;">
+              <div class="flex items-center gap-2 text-[11px] text-muted mb-3">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                <span class="font-medium text-text">Calendar</span>
+                <span class="ml-auto font-mono text-[10px] uppercase tracking-wider text-muted">New event</span>
+              </div>
+              <div class="flex items-stretch gap-3.5">
+                <div class="text-center min-w-[42px]">
+                  <div class="text-[10px] text-muted font-mono uppercase tracking-wider">Tue</div>
+                  <div class="text-ink font-semibold text-[22px] leading-none mt-0.5">12</div>
+                  <div class="text-[10px] text-muted font-mono uppercase tracking-wider">May</div>
+                </div>
+                <div class="border-l-[3px] border-ink pl-3 flex-1">
+                  <div class="text-ink text-[13.5px] font-semibold leading-tight">Acme — discovery</div>
+                  <div class="text-muted text-[11.5px] mt-1">2:00 – 2:45 PM</div>
+                  <div class="text-muted text-[11.5px]">with Jane Park · Zoom</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notion page -->
+            <div class="absolute bg-paper border border-line rounded-2xl p-4 shadow-card"
+                 style="bottom:0; left:6%; right:8%; transform: rotate(-1.5deg); z-index:3;">
+              <div class="flex items-center gap-2 text-[11px] text-muted mb-2">
+                <span class="w-4 h-4 rounded-[3px] bg-ink text-white flex items-center justify-center" style="font-size:9px; font-weight:700; line-height:1;">N</span>
+                <span class="font-medium text-text">Notion</span>
+                <span class="text-muted">·</span>
+                <span class="font-mono text-[10.5px]">Sales / Acme</span>
+              </div>
+              <div class="text-ink text-[13.5px] font-semibold">Q3 Pilot Plan — Acme</div>
+              <div class="flex items-center gap-1.5 mt-2.5">
+                <span style="font-size:10px; padding:2px 7px; border-radius:4px; background:#EFEDE6; color:#0A2540; font-weight:600;">In progress</span>
+                <span style="font-size:10px; padding:2px 7px; border-radius:4px; background:#EFEDE6; color:#6B7280;">Updated 2m ago by Chief</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="md:col-span-5 order-2">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-mono text-[13px] text-muted">02</span>
+            <span class="h-px w-10 bg-line"></span>
+            <span class="eyebrow text-ink">Execute</span>
+          </div>
+          <h3 class="display-sm text-ink text-[30px] md:text-[40px] font-semibold leading-[1.1]">
+            Chief does the work.
+          </h3>
+          <p class="text-text/75 text-[16px] md:text-[17px] leading-relaxed mt-5 max-w-md">
+            Schedules meetings, drafts emails, researches prospects, chases vendors, summarizes calls, and runs your follow-ups. It works inside the tools you already pay for.
+          </p>
+          <div class="mt-7 flex flex-wrap gap-2">
+            <span class="pill" style="font-size:11px;">Gmail</span>
+            <span class="pill" style="font-size:11px;">Calendar</span>
+            <span class="pill" style="font-size:11px;">Notion</span>
+            <span class="pill" style="font-size:11px;">Slack</span>
+            <span class="pill" style="font-size:11px;">Drive</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ACT 03 — REMEMBER -->
+      <article class="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+        <div class="md:col-span-5 order-2 md:order-1">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-mono text-[13px] text-muted">03</span>
+            <span class="h-px w-10 bg-line"></span>
+            <span class="eyebrow text-ink">Remember</span>
+          </div>
+          <h3 class="display-sm text-ink text-[30px] md:text-[40px] font-semibold leading-[1.1]">
+            Your second brain, written to disk.
+          </h3>
+          <p class="text-text/75 text-[16px] md:text-[17px] leading-relaxed mt-5 max-w-md">
+            Every interaction lands as plain markdown in a private Obsidian vault inside your iCloud. Open it on Mac, iPhone, or iPad. Searchable in Spotlight. Encrypted by Apple. Cancel anytime, keep everything.
+          </p>
+          <div class="mt-7 font-mono text-[11.5px] text-muted leading-relaxed">
+            <div>~/iCloud/Founder Vault/</div>
+            <div class="pl-3">people/, companies/, decisions/,</div>
+            <div class="pl-3">follow-ups/, research/, legal/</div>
+          </div>
+        </div>
+        <div class="md:col-span-7 order-1 md:order-2 flex justify-center md:justify-end">
+          <!-- Output artifact: markdown file with breadcrumb -->
+          <div class="w-full max-w-[460px]">
+            <div class="rounded-2xl shadow-mac overflow-hidden border border-[#2A2A30]" style="background:#1E1E22;">
+              <!-- breadcrumb header -->
+              <div class="flex items-center gap-1.5 px-5 py-3 border-b border-[#2A2A30] text-[11px] font-mono">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7C5CFF" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 17l9 4 9-4"/><path d="M3 12l9 4 9-4"/></svg>
+                <span class="text-[#7C7C84]">Founder Vault</span>
+                <span class="text-[#3F3F47]">›</span>
+                <span class="text-[#7C7C84]">follow-ups</span>
+                <span class="text-[#3F3F47]">›</span>
+                <span class="text-white">2026-05-08-acme-pilot.md</span>
+                <span class="ml-auto flex items-center gap-1 text-[#7C5CFF]">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#7C5CFF]"></span>
+                  <span style="font-size:10px;">synced</span>
+                </span>
+              </div>
+              <!-- markdown body -->
+              <div class="px-6 py-5">
+                <div class="obs-h1" style="font-size:18px;">Acme — pilot follow-up</div>
+                <div class="obs-meta">2026-05-08 · created by Chief</div>
+                <div class="obs-h2">Context</div>
+                <p class="obs-p">Call with <span class="obs-link">[[jane-park]]</span> (CTO, <span class="obs-link">[[acme]]</span>). Verbal interest in Q3 pilot. Budget signal: ~$40k.</p>
+                <div class="obs-h2">Next actions</div>
+                <div class="obs-li">Send pilot scope by Thursday <span class="obs-tag">#follow-up</span></div>
+                <div class="obs-li">Tuesday 2pm — discovery <span class="obs-tag">#calendar</span></div>
+                <div class="obs-li">Intro <span class="obs-link">[[marc-levin]]</span> before kickoff</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<div class="rule max-w-6xl mx-auto"></div>
+
+<!-- SECTION 4 — BEHIND EVERY TEXT (sub-agents + playbook) -->
+<section id="team" class="section">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-3xl">
+      <div class="eyebrow text-muted">Behind every text</div>
+      <h2 class="display text-ink text-[36px] md:text-[56px] font-semibold mt-4">
+        Chief isn't one assistant.<br/>It's a team that built itself for you.
+      </h2>
+      <p class="text-text/75 text-[17px] md:text-[19px] leading-relaxed mt-6 max-w-[640px]">
+        On day one, Chief reads your Gmail, calendar, Notion, and meeting transcripts. Within an hour, you have a custom team of sub-agents and a starter playbook of slash commands tuned to how you actually work. Every week, the playbook gets sharper.
+      </p>
+
+      <!-- Stat strip — "behind that chat" -->
+      <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="border border-line rounded-xl p-4 bg-paper">
+          <div class="text-ink text-[28px] font-semibold display-sm leading-none">4</div>
+          <div class="text-muted text-[12px] mt-2">sub-agents engaged</div>
+        </div>
+        <div class="border border-line rounded-xl p-4 bg-paper">
+          <div class="text-ink text-[28px] font-semibold display-sm leading-none">7</div>
+          <div class="text-muted text-[12px] mt-2">tools touched</div>
+        </div>
+        <div class="border border-line rounded-xl p-4 bg-paper">
+          <div class="text-ink text-[28px] font-semibold display-sm leading-none">38<span class="text-[18px] text-muted ml-0.5">m</span></div>
+          <div class="text-muted text-[12px] mt-2">saved on this thread</div>
+        </div>
+        <div class="border border-line rounded-xl p-4 bg-paper">
+          <div class="text-ink text-[28px] font-semibold display-sm leading-none">2</div>
+          <div class="text-muted text-[12px] mt-2">skills proposed today</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 1: Sub-agent team -->
+    <article class="mt-20 md:mt-24 grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+      <div class="md:col-span-5">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="font-mono text-[13px] text-muted">01</span>
+          <span class="h-px w-10 bg-line"></span>
+          <span class="eyebrow text-ink">The team</span>
+        </div>
+        <h3 class="display-sm text-ink text-[30px] md:text-[40px] font-semibold leading-[1.1]">
+          A team behind<br/>every reply.
+        </h3>
+        <p class="text-text/75 text-[16px] md:text-[17px] leading-relaxed mt-5 max-w-md">
+          Behind the iMessage thread is an org chart of specialists. Sales drafts the email. Operations updates Notion. Finance logs the expense. Research pulls the brief. Each sub-agent has its own tools and memory — and reports back to Chief.
+        </p>
+        <p class="text-text/75 text-[16px] leading-relaxed mt-4 max-w-md">
+          You stay on iMessage. Chief delegates and consolidates. Every artifact lands in your vault.
+        </p>
+      </div>
+
+      <div class="md:col-span-7">
+        <!-- Sub-agent org card -->
+        <div class="bg-paper border border-line rounded-3xl p-6 md:p-7 shadow-card">
+          <!-- Header: Chief node -->
+          <div class="flex items-center gap-3 pb-5 border-b border-line">
+            <span class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center text-[15px] font-semibold">C</span>
+            <div>
+              <div class="text-ink font-semibold text-[14px]">Chief</div>
+              <div class="text-muted text-[11px]">Routes work · reports back · owns the brain</div>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:#10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.18);"></span>
+              <span class="text-muted text-[11px] font-mono">6 online</span>
+            </div>
+          </div>
+
+          <!-- Sub-agent grid -->
+          <div class="mt-5 grid grid-cols-2 md:grid-cols-3 gap-2.5">
+            <div class="bg-bg border border-line rounded-xl p-3.5">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(10,37,64,0.08); color:#0A2540;">S</span>
+                <span class="text-ink text-[12.5px] font-semibold">Sales</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">Gmail · Calendar · HubSpot</div>
+            </div>
+            <div class="bg-bg border border-line rounded-xl p-3.5">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(10,37,64,0.08); color:#0A2540;">O</span>
+                <span class="text-ink text-[12.5px] font-semibold">Operations</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">Notion · Slack · Drive</div>
+            </div>
+            <div class="bg-bg border border-line rounded-xl p-3.5">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(10,37,64,0.08); color:#0A2540;">F</span>
+                <span class="text-ink text-[12.5px] font-semibold">Finance</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">Stripe · QBO · Sheets</div>
+            </div>
+            <div class="bg-bg border border-line rounded-xl p-3.5">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(10,37,64,0.08); color:#0A2540;">R</span>
+                <span class="text-ink text-[12.5px] font-semibold">Research</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">Web · Files · Fireflies</div>
+            </div>
+            <div class="bg-bg border border-line rounded-xl p-3.5">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(10,37,64,0.08); color:#0A2540;">C</span>
+                <span class="text-ink text-[12.5px] font-semibold">Content</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">Docs · Email · LinkedIn</div>
+            </div>
+            <div class="rounded-xl p-3.5 border" style="background:rgba(124,92,255,0.05); border-color:rgba(124,92,255,0.20);">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-semibold" style="background:rgba(124,92,255,0.18); color:#7C5CFF;">K</span>
+                <span class="text-ink text-[12.5px] font-semibold">Knowledge</span>
+              </div>
+              <div class="text-muted text-[11px] leading-relaxed">The vault · Long-term memory</div>
+            </div>
+          </div>
+
+          <!-- Active task footer -->
+          <div class="mt-5 pt-4 border-t border-line flex items-center gap-3 text-[11px]">
+            <span class="font-mono text-muted uppercase tracking-wider">Now</span>
+            <span class="text-text/85">Drafting Acme follow-up</span>
+            <span class="ml-auto font-mono text-muted">Sales → Knowledge</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Block 2: Auto-generated playbook -->
+    <article class="mt-20 md:mt-28 grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+      <div class="md:col-span-7 order-2 md:order-1">
+        <!-- Playbook console -->
+        <div class="rounded-2xl shadow-mac overflow-hidden border border-[#2A2A30]" style="background:#1E1E22;">
+          <div class="flex items-center gap-2 px-3 h-9 border-b border-[#2A2A30]" style="background:#16161A;">
+            <span class="traffic r"></span><span class="traffic y"></span><span class="traffic g"></span>
+            <span class="ml-3 text-[#9A9AA2] text-[11px] font-mono">~/Founder Vault/.skills · week 14</span>
+          </div>
+          <div class="px-6 py-5 font-mono text-[12.5px] leading-[1.95]" style="color:#C7C7CF;">
+            <div class="text-[#7C7C84] mb-3 text-[11px]"># your playbook · 8 skills · 326 runs this month</div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/weekly-investor-update</span><span class="text-[#7C7C84]">12×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/chase-overdue-invoices</span><span class="text-[#7C7C84]">47×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/draft-followup</span><span class="text-[#7C7C84]">81×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/calendar-tetris</span><span class="text-[#7C7C84]">23×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/prep-for-monday</span><span class="text-[#7C7C84]">14×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/research-prospect</span><span class="text-[#7C7C84]">61×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/inbox-zero</span><span class="text-[#7C7C84]">92×</span></div>
+            <div class="flex justify-between"><span class="text-[#7C5CFF]">/contract-redline</span><span class="text-[#7C7C84]">6×</span></div>
+            <div class="border-t border-[#2A2A30] mt-4 pt-3 flex items-center gap-2 text-[12px]">
+              <span style="color:#34D399;">→ proposed this week:</span>
+              <span class="text-white">/onboard-new-client</span>
+              <span class="ml-auto text-[#7C7C84]">approve · skip</span>
+            </div>
+            <div class="mt-1 flex items-center gap-2 text-[12px]">
+              <span style="color:#34D399;">→ scheduled:</span>
+              <span class="text-white">/inbox-zero</span>
+              <span class="text-[#7C7C84]">— weekdays · 7:00 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="md:col-span-5 order-1 md:order-2">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="font-mono text-[13px] text-muted">02</span>
+          <span class="h-px w-10 bg-line"></span>
+          <span class="eyebrow text-ink">The playbook</span>
+        </div>
+        <h3 class="display-sm text-ink text-[30px] md:text-[40px] font-semibold leading-[1.1]">
+          Anything you do twice<br/>becomes a one-line command.
+        </h3>
+        <p class="text-text/75 text-[16px] md:text-[17px] leading-relaxed mt-5 max-w-md">
+          Day one, Chief audits your inbox, calendar, Notion, and meeting transcripts to find the work you do over and over. Then it builds you a starter playbook of slash commands tuned to how you operate.
+        </p>
+        <ul class="mt-6 space-y-3.5 text-text/80 text-[15px] leading-relaxed max-w-md">
+          <li class="flex gap-3">
+            <span class="text-ink font-mono text-[13px] mt-1">→</span>
+            <span><span class="text-ink font-medium">Run by text.</span> Send <span class="font-mono text-[13.5px] text-ink">/weekly-investor-update</span> — Chief executes.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-ink font-mono text-[13px] mt-1">→</span>
+            <span><span class="text-ink font-medium">Run on schedule.</span> <span class="font-mono text-[13.5px] text-ink">/inbox-zero</span> every weekday at 7am.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-ink font-mono text-[13px] mt-1">→</span>
+            <span><span class="text-ink font-medium">Library compounds.</span> Two new skills proposed each week. Approve, edit, or skip.</span>
+          </li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<div class="rule max-w-6xl mx-auto"></div>
+
+<!-- SECTION 5 — THE VAULT -->
+<section id="vault" class="section">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-3xl">
+      <div class="eyebrow text-muted">The vault</div>
+      <h2 class="display text-ink text-[36px] md:text-[56px] font-semibold mt-4">
+        The first AI assistant whose memory you actually own.
+      </h2>
+      <p class="text-text/75 text-[17px] md:text-[19px] leading-relaxed mt-6 max-w-[640px]">
+        Most AI assistants are black boxes. Their memory lives on someone else's servers and disappears the day you cancel. Chief is the opposite. Every contact, decision, follow-up, and workflow it learns gets written as plain markdown to an Obsidian vault in your iCloud. Open it. Read it. Edit it. Take it with you.
+      </p>
+    </div>
+
+    <!-- Side-by-side: iMessage → Obsidian -->
+    <div class="mt-16 grid lg:grid-cols-[auto_56px_1fr] gap-8 lg:gap-0 items-center">
+      <!-- Smaller iPhone -->
+      <div class="flex justify-center lg:justify-start">
+        <div class="iphone shadow-phone" style="width: 260px;">
+          <div class="iphone-screen">
+            <div class="notch" style="width:80px; height:22px;"></div>
+            <div class="imsg-status">
+              <span>9:41</span>
+              <span class="flex items-center gap-1">
+                <svg width="12" height="9" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="3" width="2" height="6" rx="1"/><rect x="4" y="2" width="2" height="8" rx="1"/><rect x="8" y="1" width="2" height="10" rx="1"/><rect x="12" y="0" width="2" height="12" rx="1"/></svg>
+              </span>
+            </div>
+            <div class="imsg-header">
+              <div class="imsg-avatar">C</div>
+              <div class="imsg-name">Chief</div>
+            </div>
+            <div class="imsg-thread">
+              <div class="imsg-bubble out">just got off a call with Acme. they want to pilot in Q3.</div>
+              <div class="imsg-bubble in">Logged. I updated the Acme page in your vault and added a follow-up to send them the pilot scope by Thursday.</div>
+              <div class="imsg-bubble out">also pencil in their CTO for next week</div>
+              <div class="imsg-bubble in">Done. Tuesday 2pm. Saved to <span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,0,0,0.05);padding:1px 4px;border-radius:3px;">/people/jane-park.md</span>.</div>
+            </div>
+            <div class="imsg-input">
+              <div class="imsg-input-box">iMessage</div>
+            </div>
+            <div class="home-indicator"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow arrow -->
+      <div class="flow hidden lg:flex items-center justify-center">
+        <svg viewBox="0 0 56 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 40 H 46" stroke="#0A2540" stroke-width="1.5" stroke-dasharray="3 4" />
+          <path d="M40 34 L 50 40 L 40 46" stroke="#0A2540" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Obsidian Mac mockup -->
+      <div class="shadow-mac">
+        <div class="mac">
+          <div class="mac-titlebar">
+            <span class="traffic r"></span><span class="traffic y"></span><span class="traffic g"></span>
+            <span class="mac-title">Founder Vault — Obsidian</span>
+            <span style="width: 52px;"></span>
+          </div>
+          <div class="obs">
+            <aside class="obs-side">
+              <div class="vault">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 17l9 4 9-4"/><path d="M3 12l9 4 9-4"/></svg>
+                Founder Vault
+              </div>
+              <div class="obs-folder open">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5"/></svg>
+                people
+              </div>
+              <div class="obs-file">jane-park.md</div>
+              <div class="obs-file">marc-levin.md</div>
+              <div class="obs-folder">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M10 7l5 5-5 5"/></svg>
+                companies
+              </div>
+              <div class="obs-folder">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M10 7l5 5-5 5"/></svg>
+                decisions
+              </div>
+              <div class="obs-folder open">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5"/></svg>
+                follow-ups
+              </div>
+              <div class="obs-file active">2026-05-08-acme-pilot.md</div>
+              <div class="obs-folder">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M10 7l5 5-5 5"/></svg>
+                research
+              </div>
+              <div class="obs-folder">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M10 7l5 5-5 5"/></svg>
+                legal
+              </div>
+            </aside>
+            <main class="obs-main">
+              <div class="obs-h1">Acme — pilot follow-up</div>
+              <div class="obs-meta">2026-05-08 · created by Chief</div>
+
+              <div class="obs-h2">Context</div>
+              <p class="obs-p">Call with <span class="obs-link">[[jane-park]]</span> (CTO, <span class="obs-link">[[acme]]</span>) on May 8. Verbal interest in Q3 pilot. Budget signal: ~$40k. No procurement blockers identified.</p>
+
+              <div class="obs-h2">Next actions</div>
+              <div class="obs-li">Send pilot scope by Thursday <span class="obs-tag">#follow-up</span></div>
+              <div class="obs-li">Intro to <span class="obs-link">[[marc-levin]]</span> (eng lead) before kickoff</div>
+              <div class="obs-li">Tuesday 2pm — discovery with CTO <span class="obs-tag">#calendar</span></div>
+
+              <div class="obs-h2">Open questions</div>
+              <div class="obs-li">Security review timeline?</div>
+              <div class="obs-li">Existing vendor contract on the seat budget?</div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust badges -->
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-3 md:gap-4">
+      <div class="pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12c2-7 16-7 18 0M3 12c2 7 16 7 18 0"/></svg>
+        Synced via iCloud
+      </div>
+      <div class="pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+        Encrypted at rest
+      </div>
+      <div class="pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>
+        Yours to keep
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule max-w-6xl mx-auto"></div>
+
+<!-- SECTION 5 — WHO IT'S FOR -->
+<section class="section">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-3xl">
+      <div class="eyebrow text-muted">Who it's for</div>
+      <h2 class="display text-ink text-[36px] md:text-[52px] font-semibold mt-4">Built for founders who can't afford a team yet.</h2>
+      <p class="text-text/75 text-[17px] md:text-[19px] leading-relaxed mt-6 max-w-[640px]">
+        You're running sales, ops, recruiting, and product at the same time. You don't have a chief of staff. You don't have an EA. You have iMessage, a calendar, and a Notion that's three weeks out of date. Chief is the leverage you need before you can hire.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-12">
+      <div class="bg-paper border border-line rounded-2xl p-6 shadow-soft">
+        <div class="eyebrow text-muted">Archetype 01</div>
+        <p class="text-ink text-[18px] font-medium mt-3 leading-snug">Solo founder, pre-seed to Series A.</p>
+      </div>
+      <div class="bg-paper border border-line rounded-2xl p-6 shadow-soft">
+        <div class="eyebrow text-muted">Archetype 02</div>
+        <p class="text-ink text-[18px] font-medium mt-3 leading-snug">Two-person team running on duct tape.</p>
+      </div>
+      <div class="bg-paper border border-line rounded-2xl p-6 shadow-soft">
+        <div class="eyebrow text-muted">Archetype 03</div>
+        <p class="text-ink text-[18px] font-medium mt-3 leading-snug">Operator who left a real job and now does everything themselves.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule max-w-6xl mx-auto"></div>
+
+<!-- SECTION 6 — FAQ -->
+<section id="faq" class="section">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="eyebrow text-muted">FAQ</div>
+    <h2 class="display text-ink text-[36px] md:text-[52px] font-semibold mt-4">Questions, answered short.</h2>
+
+    <div class="mt-12 divide-y divide-line">
+      <div class="py-6">
+        <h3 class="text-ink text-[18px] font-semibold">Why iMessage?</h3>
+        <p class="text-text/75 mt-2 leading-relaxed">Because you're already there. No new app. No new login. No friction.</p>
+      </div>
+      <div class="py-6">
+        <h3 class="text-ink text-[18px] font-semibold">What if I prefer WhatsApp or Telegram?</h3>
+        <p class="text-text/75 mt-2 leading-relaxed">Both supported. iMessage is just the default for Mac and iPhone users.</p>
+      </div>
+      <div class="py-6">
+        <h3 class="text-ink text-[18px] font-semibold">Where does my data live?</h3>
+        <p class="text-text/75 mt-2 leading-relaxed">In an Obsidian vault inside your personal iCloud. We don't store your knowledge base on our servers. You own it.</p>
+      </div>
+      <div class="py-6">
+        <h3 class="text-ink text-[18px] font-semibold">What if I cancel?</h3>
+        <p class="text-text/75 mt-2 leading-relaxed">You keep the entire vault. Everything Chief learned about your business is yours. Forever.</p>
+      </div>
+      <div class="py-6">
+        <h3 class="text-ink text-[18px] font-semibold">How is this different from ChatGPT?</h3>
+        <p class="text-text/75 mt-2 leading-relaxed">ChatGPT is a chatbot. Chief is an operator. It runs work, takes actions, and remembers everything in a knowledge base you control.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="invite" class="section">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h2 class="display text-ink text-[44px] md:text-[64px] font-semibold">Stop being the bottleneck.</h2>
+    <p class="text-text/75 mt-6 text-[17px] md:text-[19px]">We're onboarding 25 founders this month.</p>
+    <div class="mt-10">
+      <a href="mailto:tonyudotong@gmail.com?subject=Request%20an%20invite%20%E2%80%94%20Chief&body=Hi%20Chief%20team%2C%0A%0AI%27d%20like%20to%20request%20an%20invite.%0A%0AName%3A%0ACompany%3A%0AStage%3A%0AWhat%20I%27m%20bottlenecked%20on%3A" class="btn-primary text-[16px] !px-8 !py-4">Request an invite</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-line">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-muted">
+    <div class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded-md bg-ink text-white flex items-center justify-center text-[12px] font-semibold">C</span>
+      <span class="text-ink font-medium">Chief</span>
+      <span class="opacity-60">— a private chief of staff for founders.</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <a href="#how" class="hover:text-ink">How it works</a>
+      <a href="#team" class="hover:text-ink">The team</a>
+      <a href="#vault" class="hover:text-ink">The vault</a>
+      <a href="#faq" class="hover:text-ink">FAQ</a>
+      <a href="#invite" class="hover:text-ink">Request an invite</a>
+    </div>
+  </div>
+</footer>
+
+</body>
 </html>
