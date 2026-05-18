@@ -1,0 +1,8 @@
+node_modules/
+.remotion/
+*.log
+
+# Keep MP4 outputs checked in so Tony can upload to Snap without re-rendering.
+# Other intermediates are still ignored.
+out/*
+!out/*.mp4

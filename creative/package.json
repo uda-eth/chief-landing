@@ -1,0 +1,23 @@
+{
+  "name": "chief-creative",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion compositions for Chief Snap ads. 1080x1920 9s vertical MP4.",
+  "scripts": {
+    "start": "remotion studio",
+    "preview": "remotion studio",
+    "render:identity": "remotion render IdentityMirror out/identity-mirror.mp4 --codec h264",
+    "render:pain": "remotion render PainPoint out/pain-point.mp4 --codec h264",
+    "render:all": "npm run render:identity && npm run render:pain"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.462",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.462"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3",
+    "typescript": "5.5.3"
+  }
+}

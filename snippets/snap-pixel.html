@@ -1,0 +1,81 @@
+<!--
+  Snap Pixel install for chief.remyndai.com
+
+  Two blocks in this file:
+    1. BASE PIXEL: paste into index.html directly before </head>
+    2. SIGN_UP EVENT: paste into thank-you/index.html directly before </head>
+
+  Replace PIXEL_ID_PENDING with the real pixel ID from Eric Fettner (847-204-5833).
+  After replacement, do a project-wide search to confirm zero remaining instances of PIXEL_ID_PENDING.
+
+  Verify install with the Snap Pixel Helper Chrome extension.
+  In Snap Ads Manager, Events Manager, the pixel should show "Receiving Events" within an hour of first hit.
+
+  This file is a template only. It is NOT loaded by the live site.
+-->
+
+
+<!-- =========================================================
+     1. BASE PIXEL
+     Paste this block into index.html, directly before </head>.
+     Fires PAGE_VIEW on every load of the landing page.
+========================================================= -->
+
+<!-- Snap Pixel Code -->
+<script type="text/javascript">
+(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+r.src=n;var u=t.getElementsByTagName(s)[0];
+u.parentNode.insertBefore(r,u);})(window,document,
+'https://sc-static.net/scevent.min.js');
+
+snaptr('init', 'PIXEL_ID_PENDING');
+
+snaptr('track', 'PAGE_VIEW');
+</script>
+<!-- End Snap Pixel Code -->
+
+
+<!-- =========================================================
+     2. SIGN_UP EVENT
+     Paste this block into thank-you/index.html, directly before </head>.
+     Includes the base pixel init (the user may land on /thank-you without first hitting /)
+     plus the SIGN_UP conversion fire. Snap requires SIGN_UP for conversion optimization.
+========================================================= -->
+
+<!-- Snap Pixel Code + SIGN_UP -->
+<script type="text/javascript">
+(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+r.src=n;var u=t.getElementsByTagName(s)[0];
+u.parentNode.insertBefore(r,u);})(window,document,
+'https://sc-static.net/scevent.min.js');
+
+snaptr('init', 'PIXEL_ID_PENDING');
+
+snaptr('track', 'PAGE_VIEW');
+snaptr('track', 'SIGN_UP');
+</script>
+<!-- End Snap Pixel Code -->
+
+
+<!--
+  Optional: enriched SIGN_UP with hashed email
+  If the form posts back to the page or you can read the email from a URL param,
+  fire SIGN_UP with the user_email parameter so Snap can match conversions to ad views.
+
+  Snap will SHA-256 hash it on their side. Do not hash it yourself.
+
+  Example (replace the body and paste in addition to, or in place of, the SIGN_UP block above):
+
+  snaptr('track', 'SIGN_UP', { user_email: 'user@example.com' });
+
+  Pull the email from the URL query if you appended it on form submit:
+
+  const params = new URLSearchParams(window.location.search);
+  const email = params.get('lead_email');
+  if (email) snaptr('track', 'SIGN_UP', { user_email: email });
+  else snaptr('track', 'SIGN_UP');
+-->
