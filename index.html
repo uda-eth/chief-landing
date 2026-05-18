@@ -6,6 +6,14 @@
 <title>Chief — Your chief of staff. In iMessage.</title>
 <meta name="description" content="Chief is an AI chief of staff for founders. Text it over iMessage. Every interaction is written to a private Obsidian vault in your iCloud. You own the brain." />
 <meta name="theme-color" content="#F7F6F3" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WXVVB2ETRN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WXVVB2ETRN');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -218,6 +226,42 @@
     .section { padding: 64px 0; }
     .iphone { width: 280px; }
   }
+
+  /* Invite form */
+  .invite-field {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #E5E3DD;
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 15px;
+    color: #1A1A1A;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  .invite-field::placeholder { color: #9CA3AF; }
+  .invite-field:focus {
+    border-color: #0A2540;
+    box-shadow: 0 0 0 3px rgba(10,37,64,0.08);
+  }
+  .invite-field.error { border-color: #EF4444; }
+  textarea.invite-field { resize: vertical; min-height: 100px; line-height: 1.5; }
+  .invite-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0A2540;
+    margin-bottom: 6px;
+  }
+  .invite-error-inline {
+    font-size: 13px;
+    color: #EF4444;
+    margin-top: 8px;
+    display: none;
+  }
+  .invite-error-inline.show { display: block; }
 </style>
 </head>
 <body class="font-sans">
@@ -937,12 +981,35 @@
 
 <!-- FINAL CTA -->
 <section id="invite" class="section">
-  <div class="max-w-3xl mx-auto px-6 text-center">
-    <h2 class="display text-ink text-[44px] md:text-[64px] font-semibold">Stop being the bottleneck.</h2>
-    <p class="text-text/75 mt-6 text-[17px] md:text-[19px]">We're onboarding 25 founders this month.</p>
-    <div class="mt-10">
-      <a href="mailto:tonyudotong@gmail.com?subject=Request%20an%20invite%20%E2%80%94%20Chief&body=Hi%20Chief%20team%2C%0A%0AI%27d%20like%20to%20request%20an%20invite.%0A%0AName%3A%0ACompany%3A%0AStage%3A%0AWhat%20I%27m%20bottlenecked%20on%3A" class="btn-primary text-[16px] !px-8 !py-4">Request an invite</a>
+  <div class="max-w-xl mx-auto px-6">
+    <div class="text-center mb-10">
+      <h2 class="display text-ink text-[44px] md:text-[64px] font-semibold">Stop being the bottleneck.</h2>
+      <p class="text-text/75 mt-6 text-[17px] md:text-[19px]">We're onboarding 25 founders this month.</p>
     </div>
+    <form id="invite-form" novalidate>
+      <div class="space-y-5">
+        <div>
+          <label class="invite-label" for="invite-name">Name</label>
+          <input id="invite-name" name="name" type="text" required class="invite-field" autocomplete="name" />
+        </div>
+        <div>
+          <label class="invite-label" for="invite-email">Email</label>
+          <input id="invite-email" name="email" type="email" required class="invite-field" autocomplete="email" />
+        </div>
+        <div>
+          <label class="invite-label" for="invite-company">Company</label>
+          <input id="invite-company" name="company" type="text" required class="invite-field" autocomplete="organization" />
+        </div>
+        <div>
+          <label class="invite-label" for="invite-bottleneck">What you're bottlenecked on</label>
+          <textarea id="invite-bottleneck" name="bottleneck" required class="invite-field" placeholder="Be specific. Helps us decide who to onboard next."></textarea>
+        </div>
+      </div>
+      <div class="mt-8">
+        <button id="invite-submit" type="submit" class="btn-primary w-full text-[16px] !py-4">Request an invite</button>
+      </div>
+      <p id="invite-network-error" class="invite-error-inline text-center">Couldn't send. Try again or email <a href="mailto:tonyudotong@gmail.com" class="underline">tonyudotong@gmail.com</a> directly.</p>
+    </form>
   </div>
 </section>
 
@@ -964,5 +1031,88 @@
   </div>
 </footer>
 
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var utmSource   = params.get('utm_source')   || '';
+  var utmMedium   = params.get('utm_medium')   || '';
+  var utmCampaign = params.get('utm_campaign') || '';
+  var utmContent  = params.get('utm_content')  || '';
+  var referrer    = document.referrer || '';
+
+  var form   = document.getElementById('invite-form');
+  var btn    = document.getElementById('invite-submit');
+  var netErr = document.getElementById('invite-network-error');
+
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var name       = document.getElementById('invite-name').value.trim();
+    var email      = document.getElementById('invite-email').value.trim();
+    var company    = document.getElementById('invite-company').value.trim();
+    var bottleneck = document.getElementById('invite-bottleneck').value.trim();
+
+    var valid = true;
+    ['invite-name', 'invite-email', 'invite-company', 'invite-bottleneck'].forEach(function (id) {
+      document.getElementById(id).classList.remove('error');
+    });
+    netErr.classList.remove('show');
+
+    if (!name)                      { document.getElementById('invite-name').classList.add('error');       valid = false; }
+    if (!email || !emailRe.test(email)) { document.getElementById('invite-email').classList.add('error');      valid = false; }
+    if (!company)                   { document.getElementById('invite-company').classList.add('error');    valid = false; }
+    if (!bottleneck)                { document.getElementById('invite-bottleneck').classList.add('error'); valid = false; }
+
+    if (!valid) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+
+    var payload = {
+      candidate_id:         'chief',
+      product_name:         'Chief',
+      product_slug:         'chief',
+      subdomain:            'https://chief.remyndai.com',
+      lead_name:            name,
+      lead_email:           email,
+      company_school:       company,
+      intent_signal:        bottleneck,
+      notes_from_lead:      bottleneck,
+      custom_question:      "What you're bottlenecked on",
+      custom_answer:        bottleneck,
+      source:               utmSource   || 'direct',
+      channel:              utmMedium   || 'organic',
+      campaign:             utmCampaign || '',
+      utm_source:           utmSource,
+      utm_medium:           utmMedium,
+      utm_campaign:         utmCampaign,
+      utm_content:          utmContent,
+      referrer:             referrer,
+      landing_page_url:     window.location.href,
+      confirmation_page_url:'https://chief.remyndai.com/thank-you',
+      consent_captured:     'Yes'
+    };
+
+    window.gtag && window.gtag('event', 'generate_lead', { source: utmSource || 'direct' });
+
+    fetch('https://script.google.com/macros/s/AKfycbyxuWxWeaaXQPNzqBByPpDTheRpKAhd05Tro3Hgw56hLEKrnH6k-mu6VjXh-12VSM7N/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function () {
+      window.location.href = '/thank-you';
+    })
+    .catch(function () {
+      btn.disabled = false;
+      btn.textContent = 'Request an invite';
+      netErr.classList.add('show');
+    });
+  });
+})();
+</script>
 </body>
 </html>

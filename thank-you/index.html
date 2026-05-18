@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>You're on the list. — Chief</title>
+<meta name="description" content="Thanks for requesting an invite to Chief." />
+<meta name="theme-color" content="#F7F6F3" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WXVVB2ETRN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WXVVB2ETRN');
+  window.gtag && window.gtag('event', 'page_view', { page_path: '/thank-you' });
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['-apple-system','BlinkMacSystemFont','SF Pro Text','SF Pro Display','Inter','ui-sans-serif','system-ui','sans-serif'],
+          display: ['-apple-system','BlinkMacSystemFont','SF Pro Display','Inter','ui-sans-serif','system-ui','sans-serif'],
+          mono: ['JetBrains Mono','ui-monospace','SF Mono','monospace'],
+        },
+        colors: {
+          bg:    '#F7F6F3',
+          ink:   '#0A2540',
+          text:  '#1A1A1A',
+          muted: '#6B7280',
+          line:  '#E5E3DD',
+        },
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background: #F7F6F3;
+    color: #1A1A1A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .display { letter-spacing: -0.025em; line-height: 1.04; }
+  .grain {
+    background-image:
+      radial-gradient(rgba(10,37,64,0.025) 1px, transparent 1px),
+      radial-gradient(rgba(10,37,64,0.02) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 1px;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #0A2540; color: #FFFFFF;
+    padding: 14px 22px; border-radius: 999px;
+    font-weight: 500; font-size: 15px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    box-shadow: 0 1px 0 rgba(10,37,64,0.06), 0 8px 20px -10px rgba(10,37,64,0.35);
+  }
+  .btn-primary:hover { background: #06192C; transform: translateY(-1px); }
+  .fadeIn { opacity: 0; transform: translateY(8px); animation: fadeIn .7s ease forwards; }
+  @keyframes fadeIn { to { opacity:1; transform:none; } }
+  .d200 { animation-delay: .16s; }
+  .d400 { animation-delay: .32s; }
+</style>
+</head>
+<body class="font-sans min-h-screen flex flex-col">
+
+<!-- NAV -->
+<header class="border-b border-line/70 bg-bg/80 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <span class="w-7 h-7 rounded-lg bg-ink text-white flex items-center justify-center text-[13px] font-semibold">C</span>
+      <span class="text-ink font-semibold tracking-tight">Chief</span>
+    </a>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="grain flex-1 flex items-center justify-center">
+  <div class="max-w-xl mx-auto px-6 py-24 text-center">
+    <div class="fadeIn">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ink text-white text-[22px] font-semibold mb-8">C</div>
+      <h1 class="display text-ink text-[44px] md:text-[60px] font-semibold">You're on the list.</h1>
+    </div>
+    <div class="fadeIn d200">
+      <p class="text-text/75 text-[17px] md:text-[19px] leading-relaxed mt-6 max-w-md mx-auto">
+        We onboard founders one at a time. Expect a reply from tonyudotong@gmail.com within 48 hours. While you wait, start thinking about the first three things you'd hand off.
+      </p>
+    </div>
+    <div class="fadeIn d400 mt-10">
+      <a href="/" class="btn-primary">Back to home</a>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-line">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-muted">
+    <div class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded-md bg-ink text-white flex items-center justify-center text-[12px] font-semibold">C</span>
+      <span class="text-ink font-medium">Chief</span>
+      <span class="opacity-60">— a private chief of staff for founders.</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <a href="/#how" class="hover:text-ink">How it works</a>
+      <a href="/#team" class="hover:text-ink">The team</a>
+      <a href="/#vault" class="hover:text-ink">The vault</a>
+      <a href="/#faq" class="hover:text-ink">FAQ</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

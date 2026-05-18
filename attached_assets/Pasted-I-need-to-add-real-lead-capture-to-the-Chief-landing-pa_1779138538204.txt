@@ -1,0 +1,113 @@
+I need to add real lead capture to the Chief landing page. The page is already built and deployed. Right now all "Request an invite" CTAs (in the nav, the hero, and the bottom of the page) open a mailto: link. Replace that flow with a real form that POSTs to a Google Apps Script webhook, then redirects to a thank-you page.
+
+==========================================
+WHAT TO BUILD
+==========================================
+
+1. Replace the existing #invite section at the bottom of the page (currently "Stop being the bottleneck. We're onboarding 25 founders this month." with a mailto link) with an actual form. Keep the same headline and supporting copy. The mailto button becomes a form.
+
+2. Form fields (single column, stacked, matching the existing dark/minimal aesthetic of the page):
+   - Name (text, required)
+   - Email (email, required, with regex validation)
+   - Company (text, required)
+   - What you're bottlenecked on (textarea, required) — placeholder: "Be specific. Helps us decide who to onboard next."
+   - Submit button: "Request an invite" (same styling as existing CTAs)
+
+3. Update the two OTHER "Request an invite" CTAs (nav button and hero button) so they smooth-scroll to #invite. Keep them as anchors, just make sure the scroll target is the new form.
+
+4. Add a new route / page at /thank-you. Match the existing page aesthetic exactly (same fonts, same dark palette, same footer). Content:
+   - Headline: "You're on the list."
+   - Body: "We onboard founders one at a time. Expect a reply from tonyudotong@gmail.com within 48 hours. While you wait, start thinking about the first three things you'd hand off."
+   - A "Back to home" link
+
+==========================================
+FORM SUBMISSION BEHAVIOR
+==========================================
+
+On page load, read these from window.location.search and store in state:
+- utm_source
+- utm_medium
+- utm_campaign
+- utm_content
+Also capture document.referrer.
+
+On submit:
+
+1. Disable the submit button, change label to "Sending…"
+
+2. POST to this webhook with mode: 'no-cors' (it's a Google Apps Script — the browser won't see the response, that's expected):
+
+https://script.google.com/macros/s/AKfycbyxuWxWeaaXQPNzqBByPpDTheRpKAhd05Tro3Hgw56hLEKrnH6k-mu6VjXh-12VSM7N/exec
+
+3. Payload (JSON, Content-Type application/json):
+{
+  "candidate_id": "chief",
+  "product_name": "Chief",
+  "product_slug": "chief",
+  "subdomain": "https://chief.remyndai.com",
+  "lead_name": "<form: name>",
+  "lead_email": "<form: email>",
+  "company_school": "<form: company>",
+  "intent_signal": "<form: bottlenecked on>",
+  "notes_from_lead": "<form: bottlenecked on>",
+  "custom_question": "What you're bottlenecked on",
+  "custom_answer": "<form: bottlenecked on>",
+  "source": "<utm_source or 'direct'>",
+  "channel": "<utm_medium or 'organic'>",
+  "campaign": "<utm_campaign or ''>",
+  "utm_source": "<from URL or ''>",
+  "utm_medium": "<from URL or ''>",
+  "utm_campaign": "<from URL or ''>",
+  "utm_content": "<from URL or ''>",
+  "referrer": "<document.referrer>",
+  "landing_page_url": "<window.location.href>",
+  "confirmation_page_url": "https://chief.remyndai.com/thank-you",
+  "consent_captured": "Yes"
+}
+
+4. When the fetch promise resolves (success or no-cors opaque response), navigate to /thank-you.
+
+5. If the fetch throws (network error), re-enable the button, change label back to "Request an invite", show an inline error message: "Couldn't send. Try again or email tonyudotong@gmail.com directly."
+
+==========================================
+GA4 TRACKING
+==========================================
+
+Confirm Google Analytics 4 is installed in the <head> of the site. If not present, add it:
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WXVVB2ETRN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WXVVB2ETRN');
+</script>
+
+If the site is an SPA, fire a page_view event on route change to /thank-you:
+window.gtag && window.gtag('event', 'page_view', { page_path: '/thank-you' });
+
+Also fire a custom event on successful form submission:
+window.gtag && window.gtag('event', 'generate_lead', { source: '<utm_source or direct>' });
+
+==========================================
+DEPLOYMENT REQUIREMENTS
+==========================================
+
+- /thank-you must be reachable via direct URL (SPA fallback configured so refresh doesn't 404)
+- Form must work on mobile Safari and Chrome
+- No regressions to existing page layout, fonts, colors, or animations
+- Do not change any copy, sections, or design elsewhere on the page
+
+==========================================
+DO NOT DO
+==========================================
+
+- Do not redesign the existing page
+- Do not add validation popups or modals — inline error messages only
+- Do not change the existing nav, hero, FAQ, or any section other than #invite
+- Do not remove the existing footer
+- Do not switch the form to use a third-party service (Typeform, Formspree, etc) — direct POST to the Apps Script webhook only
+- Do not use em dashes in any new copy
+
+When done, give me the live URL so I can run a test lead through and confirm it lands in the candidate sheet.
